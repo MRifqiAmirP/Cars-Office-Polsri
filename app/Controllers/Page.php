@@ -7,7 +7,7 @@ class Page extends Controller
     public function login()
     {
         $data = [
-            'title' => 'Login Page',
+            'title' => 'Login',
             'bodyClass' => 'login-layout'
         ];
         return view('pages/login', $data);
@@ -15,7 +15,7 @@ class Page extends Controller
 
     public function index()
     {
-        $data = ['title' => 'Home'];
+        $data = ['title' => 'Dashboard'];
         return view('pages/index', $data);
     }
 

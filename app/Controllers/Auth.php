@@ -6,10 +6,7 @@ class Auth extends Controller
 {
     public function login()
     {
-        return view('pages/login', [
-            'title' => 'Login Page - Ace Admin',
-            'bodyClass' => 'login-layout'
-        ]);
+        return view('pages/login');
     }
 
     public function action()
