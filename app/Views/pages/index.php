@@ -1260,7 +1260,9 @@
 		<i class="ace-icon fa fa-angle-double-up icon-only bigger-110"></i>
 	</a>
 </div><!-- /.main-container -->
+<?= $this->endSection() ?>
 
+<?= $this->section('scripts') ?>
 <!--[if IE]>
 <script src="assets/js/jquery-1.11.3.min.js"></script>
 <![endif]-->
@@ -1548,4 +1550,4 @@
 
 	})
 </script>
-<?= $this->endSection() ?>
+<?= $this->endSection(); ?>

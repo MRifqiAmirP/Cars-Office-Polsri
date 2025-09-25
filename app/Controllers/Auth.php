@@ -1,17 +1,35 @@
-<?php namespace App\Controllers;
+<?php
+
+namespace App\Controllers;
 
 use CodeIgniter\Controller;
+use CodeIgniter\HTTP\ResponseInterface;
 
 class Auth extends Controller
 {
-    public function login()
+    public function auth()
     {
-        return view('pages/login');
+        $nip = $this->request->getPost('nip');
+        $password = $this->request->getPost('password');
+
+        if ($nip === 'admin' && $password === 'admin') {
+            return $this->response->setJSON([
+                'statusCode' => 200,
+                'status' => 'success',
+                'message' => 'Login berhasil!'
+            ]);
+        } else {
+            return $this->response->setJSON([
+                'statusCode' => 401,
+                'status' => 'error',
+                'message' => 'NIP atau Password salah'
+            ]);
+        }
     }
 
-    public function action()
+    public function logout(): ResponseInterface
     {
-        $data = ['title' => 'Dashboard'];  
-        return view('pages/index', $data);
+        // Logic to handle user logout, e.g., destroying session
+        return redirect()->to(base_url('/login'));
     }
 }

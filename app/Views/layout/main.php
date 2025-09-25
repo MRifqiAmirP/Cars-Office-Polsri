@@ -68,11 +68,10 @@
   <script src="<?= base_url('assets/js/jquery-2.1.4.min.js') ?>"></script>
   <script src="<?= base_url('assets/js/bootstrap.min.js') ?>"></script>
   <script src="<?= base_url('assets/js/ace.min.js') ?>"></script>
+  <script src="<?= base_url('assets/js/ace-elements.min.js') ?>"></script>
 
-  <script src="assets/js/jquery-2.1.4.min.js"></script>
-  <script src="assets/js/bootstrap.min.js"></script>
-  <script src="assets/js/ace.min.js"></script>
-  <script src="assets/js/ace-elements.min.js"></script>
+  <!-- CUSTOM SCRIPT -->
+  <?= $this->renderSection('scripts'); ?>
 </body>
 
 </html>

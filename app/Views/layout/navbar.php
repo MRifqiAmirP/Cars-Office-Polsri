@@ -305,7 +305,7 @@
                         <li class="divider"></li>
 
                         <li>
-                            <a href="#">
+                            <a href="<?= base_url('/logout'); ?>">
                                 <i class="ace-icon fa fa-power-off"></i>
                                 Logout
                             </a>
