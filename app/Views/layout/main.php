@@ -39,8 +39,11 @@
   <!-- Ace settings handler -->
   <script src="assets/js/ace-extra.min.js"></script>
 
+  <!-- AXIOS -->
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
   <!-- Custom CSS -->
-  <link rel="stylesheet" href="assets/css/custom/dashboard.css" />
+  <link rel="stylesheet" href="assets/css/custom/<?= $css; ?>" />
 
   <!-- HTML5shiv and Respond.js for IE8 support -->
   <!--[if lte IE 8]>
@@ -63,6 +66,158 @@
       <?= $this->renderSection('content') ?>
     </div>
   </div>
+
+  <script>
+    // Konfigurasi Axios dengan header untuk browser
+    const api = axios.create({
+      baseURL: '<?= base_url() ?>',
+      withCredentials: true
+    });
+
+    // Tambahkan header untuk identifikasi browser request
+    api.interceptors.request.use(
+      config => {
+        config.headers['X-Requested-With'] = 'XMLHttpRequest';
+        config.headers['X-Client-Type'] = 'browser';
+        config.headers['Accept'] = 'application/json, text/plain, */*';
+        return config;
+      },
+      error => {
+        return Promise.reject(error);
+      }
+    );
+
+    // Interceptor response tetap sama
+    api.interceptors.response.use(
+      response => response,
+      error => {
+        if (error.response && error.response.status === 401) {
+          const responseData = error.response.data;
+
+          // Clear storage
+          localStorage.removeItem('user');
+          sessionStorage.removeItem('user');
+
+          // Redirect to login untuk browser
+          redirectToLogin(responseData.message || 'Sesi telah berakhir');
+
+          return Promise.reject(error);
+        }
+        return Promise.reject(error);
+      }
+    );
+
+    // Fungsi redirect
+    function redirectToLogin(message = 'Sesi telah berakhir, silakan login kembali') {
+      showNotification('error', message);
+      setTimeout(() => {
+        window.location.href = '<?= base_url('/login') ?>';
+      }, 1500);
+    }
+
+    // Fungsi check auth
+    async function checkAuthStatus() {
+      try {
+        const response = await api.get('/auth/me');
+        return response.data;
+      } catch (error) {
+        // Biarkan interceptor handle 401
+        throw error;
+      }
+    }
+
+    // Override jQuery AJAX untuk konsistensi
+    if (typeof jQuery !== 'undefined') {
+      $(document).ajaxSend(function(event, xhr, settings) {
+        xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+      });
+
+      $(document).ajaxComplete(function(event, xhr, settings) {
+        if (xhr.status === 401) {
+          try {
+            const response = JSON.parse(xhr.responseText);
+            redirectToLogin(response.message);
+          } catch (e) {
+            redirectToLogin();
+          }
+        }
+      });
+    }
+  </script>
+
+  <!-- <script>
+    const api = axios.create({
+      baseURL: '<?= base_url(); ?>',
+      withCredentials: true
+    })
+
+    api.interceptors.response.use(
+      response => response,
+      error => {
+        if (error.response.status === 401) {
+          localStorage.removeItem('user')
+          sessionStorage.removeItem('user')
+
+          showNotification('warning', 'Sesi telah habis, silahkan login kembali')
+
+          setTimeout(() => {
+            window.location.href = '<?= base_url('/login'); ?>'
+          }, 1500)
+
+          return Promise.reject(error)
+        }
+        return Promise.reject(error)
+      }
+    )
+
+    function showNotification(type, message) {
+      alert(message)
+    }
+
+    async function checkAuthStatus() {
+      try {
+        const response = await api.get('/auth/me')
+        return response.data
+      } catch (error) {
+        console.error('Auth check error:', error)
+        throw error
+      }
+    }
+
+    async function logout() {
+      try {
+        await api.post('/auth/logout')
+        localStorage.removeItem('user')
+        sessionStorage.removeItem('user')
+        window.location.href = '<?= base_url('/login'); ?>'
+      } catch (error) {
+        console.error('Logout error:', error)
+        window.location.href = '<?= base_url('/login'); ?>'
+      }
+    }
+
+    function updateUIForLoggedInUser(user) {
+      const userElement = document.querySelector('.user-info')
+      if (userElement && user.name) {
+        userElement.textContent = user.name
+      }
+
+      const roleElement = document.querySelector('.user-role')
+      if (roleElement && user.role) {
+        roleElement.textContent = user.role
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      if (!window.location.pathname.includes('/login')) {
+        checkAuthStatus().then(user => {
+          updateUIForLoggedInUser(user)
+        }).catch(error => {
+
+        })
+      }
+    })
+  </script> -->
 
   <!-- JS -->
   <script src="<?= base_url('assets/js/jquery-2.1.4.min.js') ?>"></script>

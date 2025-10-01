@@ -16,7 +16,7 @@ class Users extends Model
         "nip",
         "nama",
         "email",
-        "noHandphone",
+        "no_handphone",
         "jabatan",
         "password"
     ];
@@ -38,8 +38,8 @@ class Users extends Model
     protected $validationRules      = [
         'nip' => 'required|is_unique[users.nip,id,{id}]',
         'nama' => 'required',
-        'email' => 'valid_email|is_unique[users.email,id,{id}]',
-        'noHandphone' => 'is_unique[users.noHandphone,id,{id}]',
+        'email' => 'permit_empty|valid_email|is_unique[users.email,id,{id}]',
+        'no_handphone' => 'permit_empty|is_unique[users.no_handphone,id,{id}]',
         'jabatan' => 'required',
         'password' => 'required|min_length[6]'
     ];

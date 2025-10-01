@@ -15,7 +15,10 @@ class Page extends Controller
 
     public function index()
     {
-        $data = ['title' => 'Dashboard'];
+        $data = [
+            'title' => 'Dashboard',
+            'css' => 'dashboard.css'
+        ];
         return view('pages/index', $data);
     }
 

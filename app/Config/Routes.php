@@ -7,10 +7,21 @@ use CodeIgniter\Router\RouteCollection;
  */
 
 // PAGE ROUTES
-$routes->get('/', 'Page::index');
+$routes->get('/', 'Page::index', ['filter' => 'auth']);
 $routes->get('/login', 'Page::login');
 $routes->get('/calendar', 'Page::calendar');
 
 // AUTH ROUTES
-$routes->post('/login', 'Auth::auth');
-$routes->get('/logout', 'Auth::logout');
+$routes->group('auth', function($routes) {
+    $routes->post('login', 'Auth::login');
+    $routes->post('logout','Auth::logout');
+    $routes->get('me', 'Auth::me', ['filter' => 'auth']);
+});
+
+$routes->group('user', ['filter' => ['auth', 'refreshSession']], function($routes){
+    $routes->get('', 'User::index');
+    $routes->get('(:num)', 'User::show/$1');
+    $routes->post('create', 'User::create');
+    $routes->post('update/(:num)', 'User::update/$1');
+    $routes->delete('(:num)', 'User::delete/$1');
+});
