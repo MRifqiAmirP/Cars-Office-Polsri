@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controllers;
+namespace App\Controllers\API;
 
 use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
@@ -15,26 +15,6 @@ class Auth extends BaseController
     {
         $this->users = new Users();
     }
-
-    // public function auth()
-    // {
-    //     $nip = $this->request->getPost('nip');
-    //     $password = $this->request->getPost('password');
-
-    //     if ($nip === 'admin' && $password === 'admin') {
-    //         return $this->response->setJSON([
-    //             'statusCode' => 200,
-    //             'status' => 'success',
-    //             'message' => 'Login berhasil!'
-    //         ]);
-    //     } else {
-    //         return $this->response->setJSON([
-    //             'statusCode' => 401,
-    //             'status' => 'error',
-    //             'message' => 'NIP atau Password salah'
-    //         ]);
-    //     }
-    // }
 
     public function login()
     {
@@ -52,18 +32,18 @@ class Auth extends BaseController
 
         $user = $this->users->where('nip', $nip)->first();
 
-        if (!$user || !password_verify($password, $user['password'])) {
+        if (!$user || !password_verify($password, $user->password)) {
             return responseError('NIP atau password salah', 401);
         }
 
         session()->set([
-            'isLoggedIn' => true,
-            'userId' => $user['id'],
-            'nip' => $user['nip'],
-            'nama' => $user['nama'],
-            'email' => $user['email'],
-            'no_handphone' => $user['no_handphone'],
-            'jabatan' => $user['jabatan']
+            'isLoggedIn'   => true,
+            'userId'       => $user->id,
+            'nip'          => $user->nip,
+            'nama'         => $user->nama,
+            'email'        => $user->email,
+            'no_handphone' => $user->no_handphone,
+            'jabatan'      => $user->jabatan
         ]);
 
         return responseSuccess('Login berhasil');

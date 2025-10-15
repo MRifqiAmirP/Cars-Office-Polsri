@@ -281,7 +281,7 @@
                         <img class="nav-user-photo" src="assets/images/avatars/user.jpg" alt="Jason's Photo" />
                         <span class="user-info">
                             <small>Welcome,</small>
-                            Jason
+                            <?= session('nama'); ?>
                         </span>
 
                         <i class="ace-icon fa fa-caret-down"></i>
@@ -305,7 +305,7 @@
                         <li class="divider"></li>
 
                         <li>
-                            <a href="<?= base_url('/logout'); ?>">
+                            <a href="<?= base_url('/auth/logout'); ?>">
                                 <i class="ace-icon fa fa-power-off"></i>
                                 Logout
                             </a>

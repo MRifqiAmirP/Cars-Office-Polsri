@@ -9,7 +9,7 @@ class Users extends Model
     protected $table            = 'users';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
-    protected $returnType       = 'array';
+    protected $returnType       = \App\Entities\Cars::class;
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
     protected $allowedFields    = [
@@ -60,9 +60,72 @@ class Users extends Model
 
     protected function hashPassword(array $data)
     {
-        if (isset($data['data']['password'])) {
+        if (isset($data['data']['password']) && !empty($data['data']['password'])) {
             $data['data']['password'] = password_hash($data['data']['password'], PASSWORD_DEFAULT);
         }
         return $data;
     }
+
+    public function getUsersWithCars()
+    {
+        return $this->select('
+                    users.id,
+                    users.nip,
+                    users.nama,
+                    users.email,
+                    users.no_handphone,
+                    users.jabatan,
+                    users.password,
+                    users.created_at,
+                    users.updated_at,
+                    cars.id as car_id,
+                    cars.nopol,
+                    cars.merk,
+                    cars.type,
+                    cars.no_bpkb,
+                    cars.no_mesin,
+                    cars.no_rangka,
+                    cars.tahun_pembuatan,
+                    cars.keterangan
+                ')
+            ->join('cars', 'cars.user_id = users.id', 'left')
+            ->findAll();
+    }
+
+    public function getUserIdWithCars($id)
+    {
+        return $this->select('
+                    users.id,
+                    users.nip,
+                    users.nama,
+                    users.email,
+                    users.no_handphone,
+                    users.jabatan,
+                    users.password,
+                    users.created_at,
+                    users.updated_at,
+                    cars.id as car_id,
+                    cars.nopol,
+                    cars.merk,
+                    cars.type,
+                    cars.no_bpkb,
+                    cars.no_mesin,
+                    cars.no_rangka,
+                    cars.tahun_pembuatan,
+                    cars.keterangan
+                ')
+            ->join('cars', 'cars.user_id = users.id', 'left')
+            ->where('users.id', $id)
+            ->first();
+    }
+
+    // protected function hashPassword(array $data)
+    // {
+    //     if (isset($data['data']['password'])) {
+    //         if (password_get_info($data['data']['password'])['algo'] === 0) {
+    //             $data['data']['password'] = password_hash($data['data']['password'], PASSWORD_DEFAULT);
+    //         }
+    //     }
+    //     return $data;
+    // }
 }

@@ -13,15 +13,41 @@ $routes->get('/calendar', 'Page::calendar');
 
 // AUTH ROUTES
 $routes->group('auth', function($routes) {
-    $routes->post('login', 'Auth::login');
-    $routes->post('logout','Auth::logout');
-    $routes->get('me', 'Auth::me', ['filter' => 'auth']);
+    $routes->post('login', 'API\Auth::login');
+    $routes->get('logout','API\Auth::logout');
+    $routes->get('me', 'API\Auth::me', ['filter' => 'auth']);
 });
 
-$routes->group('user', ['filter' => ['auth', 'refreshSession']], function($routes){
-    $routes->get('', 'User::index');
-    $routes->get('(:num)', 'User::show/$1');
-    $routes->post('create', 'User::create');
-    $routes->post('update/(:num)', 'User::update/$1');
-    $routes->delete('(:num)', 'User::delete/$1');
+$routes->group('master/user', ['filter' => ['auth', 'refreshSession']], function($routes){
+    $routes->get('', 'API\User::index');
+    $routes->get('(:num)', 'API\User::show/$1');
+    $routes->post('create', 'API\User::create');
+    $routes->post('update/(:num)', 'API\User::update/$1');
+    $routes->delete('(:num)', 'API\User::delete/$1');
 });
+
+$routes->group('api', function($routes) {
+    $routes->group('cars', function($routes) {
+        $routes->get('', 'API\Cars::index');
+        $routes->get('(:num)', 'API\Cars::show/$1');
+        $routes->post('create', 'API\Cars::create');
+        $routes->post('update/(:num)', 'API\Cars::update');
+    });
+
+    $routes->group('services', function($routes) {
+        $routes->get('', 'API\Service::index');
+        $routes->post('create', 'API\Service::create');
+        $routes->post('update/(:num)', 'API\Service::update/$1');
+    });
+
+    $routes->group('jenis_perawatan', function($routes) {
+        $routes->get('', 'API\JenisPerawatan::index');
+        $routes->get('(:num)', 'API\JenisPerawatan::show/$1');
+        $routes->post('create', 'API\JenisPerawatan::create');
+        $routes->post('update/(:num)', 'API\JenisPerawatan::update/$1');
+        $routes->get('delete/(:num)', 'API\JenisPerawatan::delete/$1');
+    });
+});
+
+// DEBUG - GET CSRF TOKEN
+$routes->get('/debug/get-csrf', 'API\Api');

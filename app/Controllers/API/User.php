@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controllers;
+namespace App\Controllers\API;
 
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
@@ -24,7 +24,8 @@ class User extends BaseController
     public function index()
     {
         try {
-            $data = $this->users->findAll();
+            // $data = $this->users->findAll();
+            $data = $this->users->getUsersWithCars();
 
             if (empty($data)) {
                 return responseError('Data user belum diisi', 200);
@@ -46,7 +47,7 @@ class User extends BaseController
     public function show($id = null)
     {
         try {
-            $data = $this->users->find($id);
+            $data = $this->users->getUserIdWithCars($id);
             if (!$data) {
                 return responseError('User tidak ditemukan', 404, "User tidak ditemukan");
             }

@@ -34,12 +34,9 @@ class AuthFilter implements FilterInterface
     public function before(RequestInterface $request, $arguments = null)
     {
         if (!session('isLoggedIn')) {
-            // Deteksi jenis request
             if ($this->isApiRequest($request)) {
-                // Untuk API request (Postman, dll) - return JSON
                 return responseError('Harus login terlebih dahulu', 401, 'Unauthorized');
             } else {
-                // Untuk Browser request - redirect ke login
                 return redirect()->to(base_url('/login'));
             }
         }

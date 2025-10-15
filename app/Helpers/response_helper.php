@@ -5,7 +5,8 @@ if (!function_exists('responseSuccess')) {
     {
         return \Config\Services::response()
             ->setJSON([
-                'status'   => $status,
+                'statusCode'   => $status,
+                'status'    => 'success',
                 'error'    => null,
                 'messages' => [
                     'success' => $message
@@ -21,11 +22,10 @@ if (!function_exists('responseError')) {
     {
         return \Config\Services::response()
             ->setJSON([
-                'status'   => $status,
+                'statusCode'   => $status,
+                'status'    => 'error',
                 'error'    => $errors,
-                'messages' => [
-                    'error' => $message
-                ],
+                'message' => $message,
                 'data'     => null
             ])
             ->setStatusCode($status);
@@ -33,20 +33,16 @@ if (!function_exists('responseError')) {
 }
 
 if (!function_exists('responseInternalServerError')) {
-    function responseInternalServerError($throwable = null, $message = 'Internal server error')
+    function responseInternalServerError($error)
     {
-        $errorDetail = (env('CI_ENVIRONMENT') === 'development' && $throwable)
-            ? $throwable->getMessage()
-            : null;
+        $message = $error instanceof \Throwable ? $error->getMessage() : (string) $error;
 
         return \Config\Services::response()
             ->setJSON([
-                'status'   => 500,
-                'error'    => $errorDetail,
-                'messages' => [
-                    'error' => $message
-                ],
-                'data'     => null
+                'title' => 'Error',
+                'type' => 'Error',
+                'code' => 500,
+                'message' => $message
             ])
             ->setStatusCode(500);
     }

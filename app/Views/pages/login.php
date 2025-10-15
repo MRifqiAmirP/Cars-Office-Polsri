@@ -392,14 +392,15 @@
 			let formData = new FormData(form);
 
 			try {
-				let response = await fetch("<?= base_url('/login'); ?>", {
+				let response = await fetch("<?= base_url('/auth/login'); ?>", {
 					method: "POST",
 					body: formData
 				});
 
 				let result = await response.json();
+				console.log(result);
 
-				if (result.statusCode === 200) {
+				if (result.status === 200) {
 					window.location.href = "<?= base_url('/'); ?>";
 				} else {
 					Swal.fire({
