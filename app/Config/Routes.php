@@ -49,6 +49,10 @@ $routes->group('api', function($routes) {
         $routes->post('update/(:num)', 'API\JenisPerawatan::update/$1');
         $routes->get('delete/(:num)', 'API\JenisPerawatan::delete/$1');
     });
+
+    $routes->group('bengkel', function($routes) {
+        $routes->post('create', 'API\Bengkel::create');
+    });
 });
 
 // DEBUG - GET CSRF TOKEN
