@@ -26,8 +26,7 @@ class Service extends BaseController
     public function index()
     {
         try {
-            $serviceModel = new \App\Models\Services();
-            $services = $serviceModel->findAll();
+            $services = $this->services->findAll();
 
             if (empty($services)) {
                 return responseError("Tidak ada data services", 400);
@@ -56,7 +55,22 @@ class Service extends BaseController
      */
     public function show($id = null)
     {
-        //
+        try {
+            $service = $this->services->find($id);
+
+            if (empty($service)) {
+                return responseError("Data services tidak ditemukan", 404);
+            }
+
+            $data = [
+                'service' => $service,
+                'jenis_perawatan' => $service->getJenisPerawatanList()
+            ];
+
+            return responseSuccess("Data service berhasil diambil", $data);
+        } catch (\Throwable $th) {
+            return responseInternalServerError($th->getMessage());
+        }
     }
 
     /**
@@ -167,24 +181,24 @@ class Service extends BaseController
         try {
             $serviceModel = new \App\Models\Services();
             $pivotModel = new \App\Models\ServiceJenisPerawatanPivot();
-    
+
             $data = $this->request->getPost();
-    
+
             if (!$data) {
                 return responseError("Tidak ada data yang dikirim", 400);
             }
-    
+
             $service = $serviceModel->find($id);
             if (!$service) {
                 return responseError("Data service tidak ditemukan", 404);
             }
-  
+
             if (isset($data['speedometer_saat_ini']) && isset($data['speedometer_yang_lalu'])) {
                 if ($data['speedometer_saat_ini'] < $data['speedometer_yang_lalu']) {
                     return responseError('Speedometer saat ini tidak boleh lebih kecil dari speedometer yang lalu.', 400);
                 }
             }
-    
+
             $jenisPerawatanIds = [];
             if (isset($data['jenis_perawatan'])) {
                 if (is_string($data['jenis_perawatan'])) {
@@ -195,25 +209,25 @@ class Service extends BaseController
                 }
             }
             unset($data['jenis_perawatan']);
-    
+
             if (!$serviceModel->update($id, $data)) {
                 return responseError("Gagal memperbarui service", 400, $serviceModel->errors());
             }
-    
+
             $pivotModel->where('service_id', $id)->delete();
-    
+
             if (!empty($jenisPerawatanIds)) {
                 $jenisPerawatanIds = array_values(array_filter($jenisPerawatanIds));
-                
+
                 if (!empty($jenisPerawatanIds)) {
                     $jenisModel = new \App\Models\JenisPerawatan();
                     $foundJenis = $jenisModel
                         ->whereIn('id', $jenisPerawatanIds)
                         ->findAll();
-    
+
                     $foundIds = array_column($foundJenis, 'id');
                     $missing = array_diff($jenisPerawatanIds, $foundIds);
-    
+
                     if (!empty($missing)) {
                         return responseError(
                             'Beberapa jenis perawatan tidak ditemukan di database.',
@@ -221,7 +235,7 @@ class Service extends BaseController
                             ['jenis_perawatan_tidak_ditemukan' => array_values($missing)]
                         );
                     }
-    
+
                     $insertData = [];
                     foreach ($jenisPerawatanIds as $jpId) {
                         $insertData[] = [
@@ -232,20 +246,19 @@ class Service extends BaseController
                     $pivotModel->insertBatch($insertData);
                 }
             }
-    
+
             $updatedService = $serviceModel->find($id);
-            
+
             $jenisPerawatanList = [];
             if (!empty($jenisPerawatanIds)) {
                 $jenisModel = new \App\Models\JenisPerawatan();
                 $jenisPerawatanList = $jenisModel->whereIn('id', $jenisPerawatanIds)->findAll();
             }
-    
+
             return responseSuccess("Data service berhasil diperbarui", [
                 'service' => $updatedService,
                 'jenis_perawatan' => $jenisPerawatanList
             ]);
-    
         } catch (\Throwable $th) {
             return responseInternalServerError($th->getMessage());
         }
@@ -258,5 +271,30 @@ class Service extends BaseController
      *
      * @return ResponseInterface
      */
-    public function delete($id = null) {}
+    public function delete($id = null)
+    {
+        try {
+            $pivotModel = new \App\Models\ServiceJenisPerawatanPivot();
+    
+            if (!$id) {
+                return responseError("ID service tidak diberikan", 400);
+            }
+    
+            $service = $this->services->find($id);
+            if (!$service) {
+                return responseError("Data service tidak ditemukan", 404);
+            }
+    
+            $pivotModel->where('service_id', $id)->delete();
+    
+            $this->services->delete($id);
+    
+            return responseSuccess("Data service berhasil dihapus", [
+                'deleted_id' => $id
+            ]);
+    
+        } catch (\Throwable $th) {
+            return responseInternalServerError($th->getMessage());
+        }
+    }
 }

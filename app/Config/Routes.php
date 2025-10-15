@@ -36,8 +36,10 @@ $routes->group('api', function($routes) {
 
     $routes->group('services', function($routes) {
         $routes->get('', 'API\Service::index');
+        $routes->get('(:num)', 'API\Service::show/$1');
         $routes->post('create', 'API\Service::create');
         $routes->post('update/(:num)', 'API\Service::update/$1');
+        $routes->get('delete/(:num)', 'API\Service::delete/$1');
     });
 
     $routes->group('jenis_perawatan', function($routes) {
