@@ -3,6 +3,8 @@
 namespace App\Entities;
 
 use CodeIgniter\Entity\Entity;
+use \App\Models\ServiceRequest as ServiceRequestModel;
+use \App\Models\Bengkel as BengkelModel;
 
 class Cars extends Entity
 {
@@ -18,5 +20,31 @@ class Cars extends Entity
     public function getServices() {
         $servicesModel = new \App\Models\Services();
         return $servicesModel->where('kendaraan_id', $this->attributes['id'])->findAll();
+    }
+
+    public function getServiceRequests()
+    {
+        $serviceRequestModel = new ServiceRequestModel();
+        return $serviceRequestModel->where('kendaraan_id', $this->attributes['id'])->findAll();
+    }
+
+    public function getBengkels()
+    {
+        $serviceRequestModel = new ServiceRequestModel();
+        $bengkelModel = new BengkelModel();
+
+        $serviceRequests = $serviceRequestModel
+            ->select('bengkel_id')
+            ->where('kendaraan_id', $this->attributes['id'])
+            ->findAll();
+
+        $bengkelIds = array_column($serviceRequests, 'bengkel_id');
+        $bengkelIds = array_unique(array_filter($bengkelIds));
+
+        if (empty($bengkelIds)) {
+            return [];
+        }
+
+        return $bengkelModel->whereIn('id', $bengkelIds)->findAll();
     }
 }

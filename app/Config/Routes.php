@@ -51,7 +51,17 @@ $routes->group('api', function($routes) {
     });
 
     $routes->group('bengkel', function($routes) {
+        $routes->get('', 'API\Bengkel::index');
+        $routes->get('(:num)', 'API\Bengkel::show/$1');
         $routes->post('create', 'API\Bengkel::create');
+        $routes->post('update/(:num)', 'API\Bengkel::update/$1');
+    });
+
+    $routes->group('service_request', function($routes) {
+        $routes->get('', 'API\ServiceRequest::index');
+        $routes->get('(:num)', 'API\ServiceRequest::show/$1');
+        $routes->post('create', 'API\ServiceRequest::create');
+        $routes->post('update/(:num)', 'API\ServiceRequest::update/$1');
     });
 });
 

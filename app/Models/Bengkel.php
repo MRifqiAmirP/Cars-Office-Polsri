@@ -144,4 +144,21 @@ class Bengkel extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
+
+    public function getWithServiceCount()
+    {
+        return $this->select('
+                bengkel.*,
+                COUNT(service_request.id) AS total_service
+            ')
+            ->join('service_request', 'service_request.bengkel_id = bengkel.id', 'left')
+            ->groupBy('bengkel.id')
+            ->findAll();
+    }
+
+    public function getServices($bengkelId)
+    {
+        $serviceRequestModel = new \App\Models\ServiceRequest();
+        return $serviceRequestModel->where('bengkel_id', $bengkelId)->findAll();
+    }
 }
