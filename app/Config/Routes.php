@@ -11,6 +11,10 @@ $routes->get('/', 'Page::index', ['filter' => 'auth']);
 $routes->get('/login', 'Page::login');
 $routes->get('/calendar', 'Page::calendar');
 
+$routes->group('user', function($routes) {
+    $routes->get('', 'PageUser::index');
+});
+
 // AUTH ROUTES
 $routes->group('auth', function($routes) {
     $routes->post('login', 'API\Auth::login');
@@ -31,7 +35,7 @@ $routes->group('api', function($routes) {
         $routes->get('', 'API\Cars::index');
         $routes->get('(:num)', 'API\Cars::show/$1');
         $routes->post('create', 'API\Cars::create');
-        $routes->post('update/(:num)', 'API\Cars::update');
+        $routes->post('update/(:num)', 'API\Cars::update/$1');
     });
 
     $routes->group('services', function($routes) {

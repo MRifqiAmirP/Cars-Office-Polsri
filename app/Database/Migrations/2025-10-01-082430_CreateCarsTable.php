@@ -20,6 +20,11 @@ class CreateCarsTable extends Migration
                 'constraint' => 11,
                 'unsigned'   => true,
             ],
+            'foto_kendaraan' => [
+                'type' => 'VARCHAR',
+                'constraint' => 255,
+                'null' => true
+            ],
             'nopol'           => [
                 'type'       => 'VARCHAR',
                 'constraint' => 12,
@@ -61,6 +66,10 @@ class CreateCarsTable extends Migration
                 'null' => true,
             ],
             'updated_at'      => [
+                'type' => 'DATETIME',
+                'null' => true,
+            ],
+            'deleted_at'      => [
                 'type' => 'DATETIME',
                 'null' => true,
             ]

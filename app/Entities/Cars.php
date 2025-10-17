@@ -12,12 +12,14 @@ class Cars extends Entity
     protected $dates   = ['created_at', 'updated_at', 'deleted_at'];
     protected $casts   = [];
 
-    public function getUser() {
+    public function getUser()
+    {
         $userModel = new \App\Models\Users();
         return $userModel->find($this->attributes['user_id']);
     }
 
-    public function getServices() {
+    public function getServices()
+    {
         $servicesModel = new \App\Models\Services();
         return $servicesModel->where('kendaraan_id', $this->attributes['id'])->findAll();
     }
@@ -46,5 +48,23 @@ class Cars extends Entity
         }
 
         return $bengkelModel->whereIn('id', $bengkelIds)->findAll();
+    }
+
+    public function getFotoUrl()
+    {
+        if ($this->foto_kendaraan) {
+            return base_url('uploads/cars/' . $this->foto_kendaraan);
+        }
+        return base_url('uploads/cars/default-car.jpg');
+    }
+
+    public function isDeleted()
+    {
+        return $this->deleted_at !== null;
+    }
+    
+    public function getDeletedAtFormatted()
+    {
+        return $this->deleted_at ? $this->deleted_at->format('d/m/Y H:i') : null;
     }
 }

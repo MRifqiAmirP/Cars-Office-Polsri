@@ -10,10 +10,11 @@ class Cars extends Model
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $returnType       = \App\Entities\Cars::class;
-    protected $useSoftDeletes   = false;
+    protected $useSoftDeletes   = true;
     protected $protectFields    = true;
     protected $allowedFields    = [
         'user_id',
+        'foto_kendaraan',
         'nopol',
         'merk',
         'type',
@@ -39,7 +40,8 @@ class Cars extends Model
 
     // Validation
     protected $validationRules = [
-        'nopol'           => 'required|is_unique[cars.nopol,id,{id}]|max_length[12]',
+        'nopol'           => 'required|max_length[12]',
+        'foto_kendaraan'  => 'permit_empty|max_size[foto_kendaraan,5120]|is_image[foto_kendaraan]',
         'merk'            => 'required|max_length[50]',
         'type'            => 'required|max_length[50]',
         'no_bpkb'         => 'permit_empty|max_length[50]',
@@ -53,8 +55,11 @@ class Cars extends Model
     protected $validationMessages = [
         'nopol' => [
             'required'    => 'Nomor polisi wajib diisi',
-            'min_length'  => 'Nomor polisi minimal 5 karakter',
             'max_length'  => 'Nomor polisi maksimal 15 karakter',
+        ],
+        'foto_kendaraan' => [
+            'max_size' => 'Ukuran file foto maksimal 5MB',
+            'is_image' => 'File harus berupa gambar (JPG, PNG, GIF)'
         ],
         'merk' => [
             'required'    => 'Merk kendaraan wajib diisi',

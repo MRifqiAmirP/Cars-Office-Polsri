@@ -79,12 +79,45 @@ class Cars extends BaseController
                 return responseError('Tidak ada data yang diinput', 400, 'Bad request');
             }
 
+            $fotoKendaraan = $this->request->getFile('foto_kendaraan');
+
+            if ($fotoKendaraan && $fotoKendaraan->isValid() && !$fotoKendaraan->hasMoved()) {
+                $validMimeTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+                if (!in_array($fotoKendaraan->getMimeType(), $validMimeTypes)) {
+                    return responseError('Format file tidak didukung. Gunakan format JPG, PNG, atau GIF', 400);
+                }
+
+                if ($fotoKendaraan->getSize() > 5242880) {
+                    return responseError('Ukuran file terlalu besar. Maksimal 5MB', 400);
+                }
+
+                $merk = url_title($input['merk'], '_', true);
+                $type = url_title($input['type'], '_', true);
+                $nopol = url_title($input['nopol'], '_', true);
+                $kodeUnik = bin2hex(random_bytes(4));
+
+                $extension = $fotoKendaraan->getExtension();
+                $newName = "{$merk}_{$type}_{$nopol}_{$kodeUnik}.{$extension}";
+
+                $fotoKendaraan->move(FCPATH . 'uploads/cars', $newName);
+
+                $input['foto_kendaraan'] = $newName;
+            } else {
+                $input['foto_kendaraan'] = $input['foto_kendaraan'] ?? null;
+            }
+
             if (!$this->cars->insert($input)) {
+                if (isset($newName)) {
+                    @unlink(FCPATH . 'uploads/cars/' . $newName);
+                }
                 return responseError('Gagal input data kendaraan', 400, $this->cars->errors());
             }
 
             return responseSuccess('Berhasil tambah data kendaraan', $input);
         } catch (\Throwable $th) {
+            if (isset($newName)) {
+                @unlink(FCPATH . 'uploads/cars/' . $newName);
+            }
             return responseInternalServerError($th->getMessage());
         }
     }
@@ -112,19 +145,80 @@ class Cars extends BaseController
     {
         try {
             $input = $this->request->getPost();
+            $input['id'] = $id;
 
             if (!$input) {
                 return responseError('Tidak ada data yang diinput', 400, 'Empty input');
             }
 
-            if (! $this->cars->update($id, $input)) {
+            $existingCar = $this->cars->find($id);
+            if (!$existingCar) {
+                return responseError('Data mobil tidak ditemukan', 404);
+            }
+
+            $oldFoto = $existingCar->foto_kendaraan ?? '';
+
+            $fotoKendaraan = $this->request->getFile('foto_kendaraan');
+
+            if ($fotoKendaraan && $fotoKendaraan->isValid() && !$fotoKendaraan->hasMoved()) {
+                $validMimeTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+                if (!in_array($fotoKendaraan->getMimeType(), $validMimeTypes)) {
+                    return responseError('Format file tidak didukung. Gunakan format JPG, PNG, atau GIF', 400);
+                }
+
+                if ($fotoKendaraan->getSize() > 5242880) {
+                    return responseError('Ukuran file terlalu besar. Maksimal 5MB', 400);
+                }
+
+                $merk = !empty($input['merk']) ? $input['merk'] : $existingCar->merk;
+                $type = !empty($input['type']) ? $input['type'] : $existingCar->type;
+                $nopol = !empty($input['nopol']) ? $input['nopol'] : $existingCar->nopol;
+
+                $merk = url_title(trim($merk), '_', true);
+                $type = url_title(trim($type), '_', true);
+                $nopol = url_title(trim($nopol), '_', true);
+                $kodeUnik = bin2hex(random_bytes(4));
+
+                $extension = $fotoKendaraan->getExtension();
+                $newName = "{$merk}_{$type}_{$nopol}_{$kodeUnik}.{$extension}";
+
+                $uploadPath = FCPATH . 'uploads/cars';
+                if (!is_dir($uploadPath)) {
+                    mkdir($uploadPath, 0755, true);
+                }
+
+                if ($fotoKendaraan->move($uploadPath, $newName)) {
+                    $input['foto_kendaraan'] = $newName;
+                } else {
+                    return responseError('Gagal mengupload file foto', 400);
+                }
+            } else {
+                $input['foto_kendaraan'] = $oldFoto;
+            }
+
+            // $result = $this->cars->where('id', $id)->set($input)->update();
+            $result = $this->cars->update($id, $input);
+
+            if (!$result) {
+                if (isset($newName) && file_exists(FCPATH . 'uploads/cars/' . $newName)) {
+                    @unlink(FCPATH . 'uploads/cars/' . $newName);
+                }
                 return responseError('Gagal update data mobil', 400, $this->cars->errors());
             }
 
-            return responseSuccess('Berhasil update data mobil');
+            if (isset($newName) && !empty($oldFoto) && file_exists(FCPATH . 'uploads/cars/' . $oldFoto)) {
+                @unlink(FCPATH . 'uploads/cars/' . $oldFoto);
+            }
+
+            $updatedCar = $this->cars->find($id);
+
+            return responseSuccess('Berhasil update data mobil', $updatedCar);
         } catch (\Throwable $th) {
+            if (isset($newName) && file_exists(FCPATH . 'uploads/cars/' . $newName)) {
+                @unlink(FCPATH . 'uploads/cars/' . $newName);
+            }
             return responseInternalServerError($th->getMessage());
-        } 
+        }
     }
 
     /**
@@ -136,6 +230,148 @@ class Cars extends BaseController
      */
     public function delete($id = null)
     {
-        //
+        try {
+            $car = $this->cars->find($id);
+            if (!$car) {
+                return responseError('Data mobil tidak ditemukan', 404);
+            }
+
+            $hasActiveRelations = $this->checkActiveRelations($id);
+
+            if ($hasActiveRelations) {
+                return responseError(
+                    'Tidak dapat menghapus mobil karena memiliki riwayat service aktif',
+                    400,
+                    ['active_relations' => $hasActiveRelations]
+                );
+            }
+
+            if (!$this->cars->delete($id)) {
+                return responseError('Gagal menghapus data mobil', 400);
+            }
+
+            return responseSuccess('Data mobil berhasil dihapus (soft delete)');
+        } catch (\Throwable $th) {
+            return responseInternalServerError($th->getMessage());
+        }
+    }
+
+    public function deleteFoto($id = null)
+    {
+        try {
+            $car = $this->cars->find($id);
+            if (!$car) {
+                return responseError('Data mobil tidak ditemukan', 404);
+            }
+
+            $fotoKendaraan = $car->foto_kendaraan;
+
+            if ($fotoKendaraan && file_exists(FCPATH . 'uploads/cars/' . $fotoKendaraan)) {
+                @unlink(FCPATH . 'uploads/cars/' . $fotoKendaraan);
+            }
+
+            $this->cars->update($id, ['foto_kendaraan' => null]);
+
+            return responseSuccess('Foto kendaraan berhasil dihapus');
+        } catch (\Throwable $th) {
+            return responseInternalServerError($th->getMessage());
+        }
+    }
+
+    public function restore($id = null)
+    {
+        try {
+            $car = $this->cars->onlyDeleted()->find($id);
+
+            if (!$car) {
+                return responseError('Data mobil yang dihapus tidak ditemukan', 404);
+            }
+
+            $restoreData = ['deleted_at' => null];
+
+            if (!$this->cars->update($id, $restoreData)) {
+                return responseError('Gagal mengembalikan data mobil', 400);
+            }
+
+            return responseSuccess('Data mobil berhasil dikembalikan');
+        } catch (\Throwable $th) {
+            return responseInternalServerError($th->getMessage());
+        }
+    }
+
+    public function forceDelete($id = null)
+    {
+        try {
+            $car = $this->cars->onlyDeleted()->find($id);
+
+            if (!$car) {
+                return responseError('Data mobil tidak ditemukan atau belum di soft delete', 404);
+            }
+
+            $this->cars->db->transStart();
+
+            if ($car->foto_kendaraan && file_exists(FCPATH . 'uploads/cars/' . $car->foto_kendaraan)) {
+                @unlink(FCPATH . 'uploads/cars/' . $car->foto_kendaraan);
+            }
+
+            $this->cars->purgeDeleted();
+
+            $this->cars->db->transComplete();
+
+            if ($this->cars->db->transStatus() === FALSE) {
+                return responseError('Gagal menghapus permanen data mobil', 400);
+            }
+
+            return responseSuccess('Data mobil berhasil dihapus permanen');
+        } catch (\Throwable $th) {
+            $this->cars->db->transRollback();
+            return responseInternalServerError($th->getMessage());
+        }
+    }
+
+    private function checkActiveRelations($carId)
+    {
+        $servicesModel = new \App\Models\Services();
+        $serviceRequestModel = new \App\Models\ServiceRequest();
+
+        $activeRelations = [];
+
+        $services = $servicesModel->where('kendaraan_id', $carId)->countAllResults();
+        if ($services > 0) {
+            $activeRelations['services'] = $services . ' riwayat service';
+        }
+
+        $activeRequests = $serviceRequestModel
+            ->where('kendaraan_id', $carId)
+            ->whereIn('status', ['pending', 'proses'])
+            ->countAllResults();
+
+        if ($activeRequests > 0) {
+            $activeRelations['active_requests'] = $activeRequests . ' request service aktif';
+        }
+
+        return empty($activeRelations) ? false : $activeRelations;
+    }
+
+    public function getDeletedCars()
+    {
+        try {
+            $deletedCars = $this->cars
+                ->onlyDeleted()
+                ->select('cars.*, users.nama as user_nama, users.nip as user_nip')
+                ->join('users', 'users.id = cars.user_id')
+                ->findAll();
+
+            return responseSuccess('Data mobil yang dihapus', $deletedCars);
+        } catch (\Throwable $th) {
+            return responseInternalServerError($th->getMessage());
+        }
+    }
+
+    public function getAllCars()
+    {
+        return $this->cars->select('cars.*, users.nama as user_nama, users.nip as user_nip')
+            ->join('users', 'users.id = cars.user_id')
+            ->findAll();
     }
 }
