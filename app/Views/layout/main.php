@@ -43,7 +43,9 @@
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
   <!-- Custom CSS -->
-  <link rel="stylesheet" href="assets/css/custom/<?= $css; ?>" />
+  <?php if (isset($css) && $css !== ''): ?>
+    <link rel="stylesheet" href="assets/css/custom/<?= $css; ?>" />
+  <?php endif; ?>
 
   <!-- HTML5shiv and Respond.js for IE8 support -->
   <!--[if lte IE 8]>
@@ -59,7 +61,20 @@
     <?= $this->include('layout/navbar') ?>
 
     <!-- Sidebar -->
-    <?= $this->include('layout/sidebar') ?>
+    <?php
+    switch ($role) {
+      case 'Superuser':
+        echo $this->include('layout/sidebar_admin');
+      case 'admin':
+        echo $this->include('layout/sidebar_admin');
+        break;
+      case 'dosen':
+        echo $this->include('layout/sidebar_user');
+        break;
+      default:
+        echo $this->include('layout/sidebar_user');
+    }
+    ?>
 
     <!-- Main content -->
     <div class="main-content">
