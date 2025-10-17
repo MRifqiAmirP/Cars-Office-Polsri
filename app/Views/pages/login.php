@@ -85,7 +85,7 @@
 							<h1>
 								<i class="ace-icon fa fa-leaf green"></i>
 								<span class="text-warning">POLSRI</span>
-								<span class="white" id="id-text2">Library</span>
+								<span class="white" id="id-text2">Car Office</span>
 							</h1>
 							<h4 class="blue" id="id-company-text">&copy; Politeknik Negeri Sriwijaya</h4>
 						</div>
@@ -138,7 +138,7 @@
 										</form>
 									</div><!-- /.widget-main -->
 
-									<div class="toolbar clearfix">
+									<!-- <div class="toolbar clearfix">
 										<div>
 											<a href="#" data-target="#forgot-box" class="forgot-password-link">
 												<i class="ace-icon fa fa-arrow-left"></i>
@@ -152,7 +152,7 @@
 												<i class="ace-icon fa fa-arrow-right"></i>
 											</a>
 										</div>
-									</div>
+									</div> -->
 								</div><!-- /.widget-body -->
 							</div><!-- /.login-box -->
 
@@ -398,9 +398,8 @@
 				});
 
 				let result = await response.json();
-				console.log(result);
 
-				if (result.status === 200) {
+				if (result.statusCode === 200) {
 					window.location.href = "<?= base_url('/'); ?>";
 				} else {
 					Swal.fire({
