@@ -63,16 +63,15 @@
     <!-- Sidebar -->
     <?php
     switch ($role) {
-      case 'Superuser':
+      case 'superuser':
         echo $this->include('layout/sidebar_admin');
+        break;
       case 'admin':
         echo $this->include('layout/sidebar_admin');
         break;
-      case 'dosen':
-        echo $this->include('layout/sidebar_user');
+      case 'user':
+        echo $this->include('layout/sidebar_dosen');
         break;
-      default:
-        echo $this->include('layout/sidebar_user');
     }
     ?>
 

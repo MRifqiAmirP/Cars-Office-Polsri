@@ -18,7 +18,6 @@ class PageUser extends BaseController
     }
 
     protected function getUserRole() {
-        // Contoh: ambil dari session
-        return session()->get('role') ?? 'guest';
+        return session()->get('role');
     }
 }

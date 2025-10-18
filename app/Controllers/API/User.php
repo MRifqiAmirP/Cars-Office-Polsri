@@ -75,17 +75,10 @@ class User extends BaseController
     public function create()
     {
         try {
-            $input = $this->request->getPost([
-                'nip',
-                'nama',
-                'email',
-                'no_handphone',
-                'jabatan',
-                'password',
-            ]);
+            $input = $this->request->getPost();
 
-            if (empty($input['nip']) || empty($input['nama']) || empty($input['jabatan']) || empty($input['password'])) {
-                return responseError('NIP, Nama, Jabatan, dan Password harus diisi', 400);
+            if (empty($input['nip']) || empty($input['nama']) || empty($input['jabatan']) || empty($input['password']) || empty($input['role'])) {
+                return responseError('NIP, Nama, Jabatan, Role dan Password harus diisi', 400);
             }
 
             if (!$this->users->insert($input)) {

@@ -17,7 +17,8 @@ class Page extends Controller
     {
         $data = [
             'title' => 'Dashboard',
-            'css' => 'dashboard.css'
+            'css' => 'dashboard.css',
+            'role' => $this->getUserRole()
         ];
         return view('pages/index', $data);
     }
@@ -26,5 +27,9 @@ class Page extends Controller
     {
         $data = ['title' => 'Calendar'];
         return view('pages/calendar', $data);
+    }
+
+    protected function getUserRole() {
+        return session()->get('role') ?? 'guest';
     }
 }
