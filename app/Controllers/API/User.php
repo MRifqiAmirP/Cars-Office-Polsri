@@ -81,9 +81,13 @@ class User extends BaseController
                 return responseError('NIP, Nama, Jabatan, Role dan Password harus diisi', 400);
             }
 
+            $duplicateCheck = $this->checkForDuplicates($input);
+            if ($duplicateCheck !== true) {
+                return $duplicateCheck;
+            }
+
             if (!$this->users->insert($input)) {
                 $errors = $this->users->errors();
-
                 return responseError('Gagal menambahkan user', 400, $errors);
             }
 
@@ -112,24 +116,22 @@ class User extends BaseController
      *
      * @return ResponseInterface
      */
-    public function update($id = null)
+    public function update($id)
     {
         try {
             $input = $this->request->getPost();
 
-            if (empty($input)) {
-                return responseError('Tidak ada data input untuk update', 400, 'Input kosong');
-            }
-
-            if (!$this->users->find($id)) {
-                return responseError('User dengan ID ' . $id . ' tidak ditemukan', 404, 'User tidak ditemukan');
+            $duplicateCheck = $this->checkForDuplicates($input, $id);
+            if ($duplicateCheck !== true) {
+                return $duplicateCheck;
             }
 
             if (!$this->users->update($id, $input)) {
-                return responseError('Gagal update data user', 400, $this->users->errors());
+                $errors = $this->users->errors();
+                return responseError('Gagal mengupdate user', 400, $errors);
             }
 
-            return responseSuccess('User updated successfully', ['id' => $id]);
+            return responseSuccess('User updated successfully');
         } catch (\Throwable $th) {
             return responseInternalServerError($th);
         }
@@ -145,5 +147,45 @@ class User extends BaseController
     public function delete($id = null)
     {
         //
+    }
+
+    private function checkForDuplicates($input, $excludeId = null)
+    {
+        $builder = $this->users;
+
+        if (!empty($input['nip'])) {
+            $builder->where('nip', $input['nip']);
+            if ($excludeId) {
+                $builder->where('id !=', $excludeId);
+            }
+            $existingNip = $builder->first();
+            if ($existingNip) {
+                return responseError('NIP sudah terdaftar', 400, ['nip' => 'NIP sudah terdaftar']);
+            }
+        }
+
+        if (!empty($input['email'])) {
+            $builder = $this->users->where('email', $input['email']);
+            if ($excludeId) {
+                $builder->where('id !=', $excludeId);
+            }
+            $existingEmail = $builder->first();
+            if ($existingEmail) {
+                return responseError('Email sudah terdaftar', 400, ['email' => 'Email sudah terdaftar']);
+            }
+        }
+
+        if (!empty($input['no_handphone'])) {
+            $builder = $this->users->where('no_handphone', $input['no_handphone']);
+            if ($excludeId) {
+                $builder->where('id !=', $excludeId);
+            }
+            $existingPhone = $builder->first();
+            if ($existingPhone) {
+                return responseError('Nomor handphone sudah terdaftar', 400, ['no_handphone' => 'Nomor handphone sudah terdaftar']);
+            }
+        }
+
+        return true;
     }
 }
