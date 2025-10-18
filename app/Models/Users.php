@@ -9,7 +9,7 @@ class Users extends Model
     protected $table            = 'users';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
-    protected $returnType       = \App\Entities\Cars::class;
+    protected $returnType       = \App\Entities\User::class;
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
     protected $allowedFields    = [
@@ -128,11 +128,11 @@ class Users extends Model
                     users.email,
                     users.no_handphone,
                     users.jabatan,
-                    users.role
+                    users.role,
                     users.created_at,
                     users.updated_at,
-                    cars.id as car_id,
                     cars.nopol,
+                    cars.foto_kendaraan,
                     cars.merk,
                     cars.type,
                     cars.no_bpkb,

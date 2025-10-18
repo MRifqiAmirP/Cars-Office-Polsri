@@ -47,13 +47,35 @@ class User extends BaseController
     public function show($id = null)
     {
         try {
-            $data = $this->users->getUserIdWithCars($id);
-            if (!$data) {
+            $user = $this->users->find($id);
+            if (!$user) {
                 return responseError('User tidak ditemukan', 404, "User tidak ditemukan");
             }
+
+            $cars = $user->getCars()[0] ?? null;
+            $services = $user->getAllServices();
+            $serviceRequests = $user->getServiceRequests();
+
+            $data = [
+                'user' => [
+                    'id' => $user->id,
+                    'nip' => $user->nip,
+                    'nama' => $user->nama,
+                    'email' => $user->email,
+                    'no_handphone' => $user->no_handphone,
+                    'jabatan' => $user->jabatan,
+                    'role' => $user->role,
+                    'created_at' => $user->created_at,
+                    'updated_at' => $user->updated_at,
+                ],
+                'kendaraan' => $cars,
+                'service' => array_map(fn($s) => $s->toArray(), $services),
+                'service_request' => array_map(fn($r) => $r->toArray(), $serviceRequests),
+            ];
+
             return responseSuccess('Data user ditemukan by ID', $data);
         } catch (\Throwable $th) {
-            return responseInternalServerError("Error");
+            return responseInternalServerError($th->getMessage());
         }
     }
 
