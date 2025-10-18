@@ -83,23 +83,8 @@ class User extends BaseController
 
             if (!$this->users->insert($input)) {
                 $errors = $this->users->errors();
-                $error  = [];
 
-                $customMessages = [
-                    'nip'          => 'NIP sudah terdaftar',
-                    'email'        => 'Email sudah terdaftar',
-                    'no_handphone' => 'No Handphone sudah terdaftar',
-                ];
-
-                foreach ($errors as $field => $msg) {
-                    if (isset($customMessages[$field])) {
-                        $error[$field] = $customMessages[$field];
-                    } else {
-                        $error[$field] = $msg;
-                    }
-                }
-
-                return responseError('Gagal menambahkan user', 400, $error);
+                return responseError('Gagal menambahkan user', 400, $errors);
             }
 
             return responseSuccess('User created successfully', ['id' => $this->users->insertID()]);

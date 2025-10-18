@@ -37,10 +37,10 @@ class Users extends Model
 
     // Validation
     protected $validationRules      = [
-        'nip' => 'required|is_unique[users.nip,id,{id}]|max_length[20]',
+        'nip' => 'required|max_length[20]',
         'nama' => 'required',
-        'email' => 'permit_empty|valid_email|is_unique[users.email,id,{id}]',
-        'no_handphone' => 'permit_empty|is_unique[users.no_handphone,id,{id}]|max_length[15]',
+        'email' => 'permit_empty|valid_email',
+        'no_handphone' => 'permit_empty|max_length[15]',
         'jabatan' => 'required',
         'role' => 'required|in_list[superuser,admin,user,ppk,wadir]',
         'password' => 'required|min_length[6]'
@@ -48,7 +48,6 @@ class Users extends Model
     protected $validationMessages   = [
         'nip' => [
             'required' => 'NIP harus diisi',
-            'is_unique' => 'NIP sudah terdaftar',
             'max_length' => 'NIP maksimal 20 karakter'
         ],
         'nama' => [
@@ -56,10 +55,8 @@ class Users extends Model
         ],
         'email' => [
             'valid_email' => 'Format email tidak valid',
-            'is_unique' => 'Email sudah terdaftar',
         ],
         'no_handphone' => [
-            'is_unique' => 'Nomor handphone sudah terdaftar',
             'max_length' => 'Nomor handphone maksimal 15 digit'
         ],
         'jabatan' => [
