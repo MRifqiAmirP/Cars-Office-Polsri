@@ -20,6 +20,11 @@ class CreateServicesTable extends Migration
                 'constraint' => 11,
                 'unsigned'   => true
             ],
+            'bengkel_id' => [
+                'type' => 'INT',
+                'constraint' => 11,
+                'unsigned'   => true
+            ],
             'tanggal' => [
                 'type' => 'DATE'
             ],
@@ -38,6 +43,11 @@ class CreateServicesTable extends Migration
                 'constraint' => 11,
                 'null'       => true
             ],
+            'foto_nota' => [
+                'type' => 'VARCHAR',
+                'constraint' => 255,
+                'null' => true
+            ],
             'created_at'      => [
                 'type' => 'DATETIME',
                 'null' => true,
@@ -49,6 +59,7 @@ class CreateServicesTable extends Migration
         ]);
 
         $this->forge->addKey('id', true);
+        $this->forge->addForeignKey('bengkel_id', 'mitra_bengkel', 'id', 'CASCADE', 'CASCADE');
         $this->forge->createTable('services');
     }
 

@@ -24,7 +24,9 @@ class ServiceRequest extends BaseController
 
     public function index()
     {
-        $data = $this->service_request
+        $userId = $this->request->getGet('user_id');
+
+        $query = $this->service_request
             ->select('
                 service_request.*, 
                 users.nama AS user_nama, 
@@ -37,10 +39,17 @@ class ServiceRequest extends BaseController
             ->join('users', 'users.id = service_request.user_id', 'left')
             ->join('cars', 'cars.id = service_request.kendaraan_id', 'left')
             ->join('mitra_bengkel', 'mitra_bengkel.id = service_request.bengkel_id', 'left')
-            ->orderBy('service_request.created_at', 'DESC')
-            ->findAll();
-        
-        return responseSuccess("Data service request berhasil diambil", $data);
+            ->orderBy('service_request.created_at', 'DESC');
+
+        if ($userId && is_numeric($userId)) {
+            $query->where('service_request.user_id', (int)$userId);
+        }
+
+        $data = $query->findAll();
+
+        $message = $userId ? "Data service request untuk user $userId berhasil diambil" : "Data service request berhasil diambil";
+
+        return responseSuccess($message, $data);
     }
 
     /**
@@ -68,10 +77,10 @@ class ServiceRequest extends BaseController
             ->where('service_request.id', $id)
             ->findAll();
 
-        if(empty($data)) {
+        if (empty($data)) {
             return responseError("Data service request tidak ditemukan", 404);
         }
-        
+
         return responseSuccess("Data service request by ID berhasil diambil", $data);
     }
 
@@ -152,22 +161,21 @@ class ServiceRequest extends BaseController
     {
         $request = $this->request;
 
-        $data = [
-            'user_id'     => $request->getPost('user_id'),
-            'kendaraan_id' => $request->getPost('kendaraan_id'),
-            'bengkel_id'  => $request->getPost('bengkel_id') ?: null,
-            'keluhan'     => $request->getPost('keluhan'),
-            'status'      => $request->getPost('status'),
-        ];
-
         $oldData = $this->service_request->find($id);
         if (!$oldData) {
             return responseError("Data tidak ditemukan", 404);
         }
 
+        $data = [
+            'user_id'      => $request->getPost('user_id') ?: $oldData->user_id,
+            'kendaraan_id' => $request->getPost('kendaraan_id') ?: $oldData->kendaraan_id,
+            'bengkel_id'   => $request->getPost('bengkel_id') ?: $oldData->bengkel_id,
+            'keluhan'      => $request->getPost('keluhan') ?: $oldData->keluhan,
+            'status'       => $request->getPost('status') ?: $oldData->status,
+        ];
+
         $file = $request->getFile('file');
         if ($file && $file->isValid() && !$file->hasMoved()) {
-
             if (!empty($oldData->file) && file_exists(FCPATH . 'uploads/service_requests/' . $oldData->file)) {
                 unlink(FCPATH . 'uploads/service_requests/' . $oldData->file);
             }

@@ -4,31 +4,32 @@
 <head>
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
   <meta charset="utf-8" />
+  <meta name="csrf-token" content="<?= csrf_hash() ?>">
   <title><?= $title ?? 'Error Title' ?></title>
 
   <meta name="description" content="overview &amp; stats" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
 
   <!-- Bootstrap & FontAwesome -->
-  <link rel="stylesheet" href="assets/css/bootstrap.min.css" />
-  <link rel="stylesheet" href="assets/font-awesome/4.5.0/css/font-awesome.min.css" />
+  <link rel="stylesheet" href="<?= base_url('assets/css/bootstrap.min.css') ?>" />
+  <link rel="stylesheet" href="<?= base_url('assets/font-awesome/4.5.0/css/font-awesome.min.css') ?>" />
 
   <!-- Page specific plugin styles -->
-  <link rel="stylesheet" href="assets/css/jquery-ui.custom.min.css" />
-  <link rel="stylesheet" href="assets/css/fullcalendar.min.css" />
+  <link rel="stylesheet" href="<?= base_url('assets/css/jquery-ui.custom.min.css') ?>" />
+  <link rel="stylesheet" href="<?= base_url('assets/css/fullcalendar.min.css') ?>" />
 
   <!-- Text fonts -->
-  <link rel="stylesheet" href="assets/css/fonts.googleapis.com.css" />
+  <link rel="stylesheet" href="<?= base_url('assets/css/fonts.googleapis.com.css') ?>" />
 
   <!-- Ace styles -->
-  <link rel="stylesheet" href="assets/css/ace.min.css" class="ace-main-stylesheet" id="main-ace-style" />
+  <link rel="stylesheet" href="<?= base_url('assets/css/ace.min.css') ?>" class="ace-main-stylesheet" id="main-ace-style" />
 
   <!--[if lte IE 9]>
         <link rel="stylesheet" href="assets/css/ace-part2.min.css" class="ace-main-stylesheet" />
     <![endif]-->
 
-  <link rel="stylesheet" href="assets/css/ace-skins.min.css" />
-  <link rel="stylesheet" href="assets/css/ace-rtl.min.css" />
+  <link rel="stylesheet" href="<?= base_url('assets/css/ace-skins.min.css') ?>" />
+  <link rel="stylesheet" href="<?= base_url('assets/css/ace-rtl.min.css') ?>" />
 
   <!--[if lte IE 9]>
         <link rel="stylesheet" href="assets/css/ace-ie.min.css" />
@@ -37,7 +38,7 @@
   <!-- Inline styles related to this page -->
 
   <!-- Ace settings handler -->
-  <script src="assets/js/ace-extra.min.js"></script>
+  <script src="<?= base_url('assets/js/ace-extra.min.js') ?>"></script>
 
   <!-- AXIOS -->
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
@@ -108,11 +109,9 @@
         if (error.response && error.response.status === 401) {
           const responseData = error.response.data;
 
-          // Clear storage
           localStorage.removeItem('user');
           sessionStorage.removeItem('user');
 
-          // Redirect to login untuk browser
           redirectToLogin(responseData.message || 'Sesi telah berakhir');
 
           return Promise.reject(error);
@@ -121,7 +120,6 @@
       }
     );
 
-    // Fungsi redirect
     function redirectToLogin(message = 'Sesi telah berakhir, silakan login kembali') {
       showNotification('error', message);
       setTimeout(() => {

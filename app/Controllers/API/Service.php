@@ -26,21 +26,38 @@ class Service extends BaseController
     public function index()
     {
         try {
-            $services = $this->services->findAll();
+            $kendaraanId = $this->request->getGet('kendaraan_id');
+
+            $serviceModel = new \App\Models\Services();
+
+            $query = $serviceModel;
+
+            if ($kendaraanId) {
+                if (!is_numeric($kendaraanId)) {
+                    return responseError("Parameter kendaraan_id harus berupa angka", 400);
+                }
+                $query->where('kendaraan_id', (int)$kendaraanId);
+            }
+
+            $services = $query->findAll();
 
             if (empty($services)) {
-                return responseError("Tidak ada data services", 400);
+                $message = $kendaraanId
+                    ? "Tidak ada data services untuk kendaraan $kendaraanId"
+                    : "Tidak ada data services";
+                return responseError($message, 400);
             }
 
             $data = [];
             foreach ($services as $service) {
-                $data[] = [
-                    'service' => $service,
-                    'jenis_perawatan' => $service->getJenisPerawatanList()
-                ];
+                $data[] = $service->toArrayWithRelations();
             }
 
-            return responseSuccess("Data service berhasil diambil", $data);
+            $message = $kendaraanId
+                ? "Data service untuk kendaraan $kendaraanId berhasil diambil"
+                : "Data service berhasil diambil";
+
+            return responseSuccess($message, $data);
         } catch (\Throwable $th) {
             return responseInternalServerError($th->getMessage());
         }
@@ -97,8 +114,38 @@ class Service extends BaseController
                 return responseError("Tidak ada data yang dikirim", 400);
             }
 
-            if ($data['speedometer_saat_ini'] < $data['speedometer_yang_lalu']) {
-                return responseError('Speedometer saat ini tidak boleh lebih kecil dari speedometer yang lalu.', 400);
+            if (!empty($data['speedometer_yang_lalu']) && !empty($data['speedometer_saat_ini'])) {
+                if ($data['speedometer_saat_ini'] < $data['speedometer_yang_lalu']) {
+                    return responseError('Speedometer saat ini tidak boleh lebih kecil dari speedometer yang lalu.', 400);
+                }
+            }
+
+            if (!empty($data['bengkel_id'])) {
+                $mitraBengkelModel = new \App\Models\Bengkel();
+                $bengkel = $mitraBengkelModel->find($data['bengkel_id']);
+                if (!$bengkel) {
+                    return responseError('Bengkel yang dipilih tidak ditemukan.', 400);
+                }
+            }
+
+            $fotoNota = $this->request->getFile('foto_nota');
+            if ($fotoNota && $fotoNota->isValid() && !$fotoNota->hasMoved()) {
+                $allowedTypes = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+                $fileExtension = $fotoNota->getClientExtension();
+
+                if (!in_array(strtolower($fileExtension), $allowedTypes)) {
+                    return responseError('Format file tidak didukung. Gunakan format: jpg, jpeg, png, gif, atau webp.', 400);
+                }
+
+                if ($fotoNota->getSize() > 2097152) {
+                    return responseError('Ukuran file terlalu besar. Maksimal 2MB.', 400);
+                }
+
+                $newName = $fotoNota->getRandomName();
+                $fotoNota->move(WRITEPATH . 'uploads/nota', $newName);
+                $data['foto_nota'] = $newName;
+            } else {
+                $data['foto_nota'] = null;
             }
 
             $jenisPerawatanIds = [];
@@ -133,9 +180,21 @@ class Service extends BaseController
                 }
             }
 
+            if (isset($data['total_harga']) && !empty($data['total_harga'])) {
+                $data['total_harga'] = preg_replace('/[^0-9.]/', '', $data['total_harga']);
+            }
+
+            $data['speedometer_yang_lalu'] = !empty($data['speedometer_yang_lalu']) ? $data['speedometer_yang_lalu'] : null;
+            $data['speedometer_saat_ini'] = !empty($data['speedometer_saat_ini']) ? $data['speedometer_saat_ini'] : null;
+            $data['total_harga'] = !empty($data['total_harga']) ? $data['total_harga'] : null;
+            $data['bengkel_id'] = !empty($data['bengkel_id']) ? $data['bengkel_id'] : null;
+
             $serviceId = $serviceModel->insert($data, true);
 
             if (!$serviceId) {
+                if (isset($data['foto_nota']) && file_exists(WRITEPATH . 'uploads/nota/' . $data['foto_nota'])) {
+                    unlink(WRITEPATH . 'uploads/nota/' . $data['foto_nota']);
+                }
                 return responseError("Gagal menambahkan service", 400, $serviceModel->errors());
             }
 
@@ -146,13 +205,17 @@ class Service extends BaseController
                 ]);
             }
 
-            $service = $serviceModel->find($serviceId);
+            $service = $serviceModel->getServiceWithRelations($serviceId);
 
             return responseSuccess("Service berhasil ditambahkan", [
                 'service' => $service,
                 'jenis_perawatan' => $jenisPerawatanIds
             ]);
         } catch (\Throwable $th) {
+            if (isset($data['foto_nota']) && !empty($data['foto_nota']) && file_exists(WRITEPATH . 'uploads/nota/' . $data['foto_nota'])) {
+                unlink(WRITEPATH . 'uploads/nota/' . $data['foto_nota']);
+            }
+
             return responseInternalServerError($th->getMessage());
         }
     }
@@ -176,51 +239,68 @@ class Service extends BaseController
      *
      * @return ResponseInterface
      */
-    public function update($id = null)
+    public function update($id)
     {
         try {
             $serviceModel = new \App\Models\Services();
-            $pivotModel = new \App\Models\ServiceJenisPerawatanPivot();
+            $service = $serviceModel->find($id);
+
+            if (!$service) {
+                return responseError('Service tidak ditemukan.', 404);
+            }
 
             $data = $this->request->getPost();
 
-            if (!$data) {
-                return responseError("Tidak ada data yang dikirim", 400);
-            }
-
-            $service = $serviceModel->find($id);
-            if (!$service) {
-                return responseError("Data service tidak ditemukan", 404);
-            }
-
-            if (isset($data['speedometer_saat_ini']) && isset($data['speedometer_yang_lalu'])) {
+            if (!empty($data['speedometer_yang_lalu']) && !empty($data['speedometer_saat_ini'])) {
                 if ($data['speedometer_saat_ini'] < $data['speedometer_yang_lalu']) {
                     return responseError('Speedometer saat ini tidak boleh lebih kecil dari speedometer yang lalu.', 400);
                 }
             }
 
-            $jenisPerawatanIds = [];
-            if (isset($data['jenis_perawatan'])) {
-                if (is_string($data['jenis_perawatan'])) {
-                    $jenisPerawatanIds = array_map('trim', explode(',', $data['jenis_perawatan']));
-                    $jenisPerawatanIds = array_filter($jenisPerawatanIds);
-                } elseif (is_array($data['jenis_perawatan'])) {
-                    $jenisPerawatanIds = array_filter($data['jenis_perawatan']);
+            if (!empty($data['bengkel_id'])) {
+                $mitraBengkelModel = new \App\Models\Bengkel();
+                $bengkel = $mitraBengkelModel->find($data['bengkel_id']);
+                if (!$bengkel) {
+                    return responseError('Bengkel yang dipilih tidak ditemukan.', 400);
                 }
             }
-            unset($data['jenis_perawatan']);
 
-            if (!$serviceModel->update($id, $data)) {
-                return responseError("Gagal memperbarui service", 400, $serviceModel->errors());
+            $fotoNota = $this->request->getFile('foto_nota');
+            if ($fotoNota && $fotoNota->isValid() && !$fotoNota->hasMoved()) {
+                $allowedTypes = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+                $fileExtension = $fotoNota->getClientExtension();
+
+                if (!in_array(strtolower($fileExtension), $allowedTypes)) {
+                    return responseError('Format file tidak didukung. Gunakan format: jpg, jpeg, png, gif, atau webp.', 400);
+                }
+
+                if ($fotoNota->getSize() > 2097152) {
+                    return responseError('Ukuran file terlalu besar. Maksimal 2MB.', 400);
+                }
+
+                if ($service->foto_nota && file_exists(WRITEPATH . 'uploads/nota/' . $service->foto_nota)) {
+                    unlink(WRITEPATH . 'uploads/nota/' . $service->foto_nota);
+                }
+
+                $newName = $fotoNota->getRandomName();
+                $fotoNota->move(WRITEPATH . 'uploads/nota', $newName);
+                $data['foto_nota'] = $newName;
             }
 
-            $pivotModel->where('service_id', $id)->delete();
+            if (isset($data['jenis_perawatan'])) {
+                $jenisPerawatanIds = [];
+                if (!empty($data['jenis_perawatan'])) {
+                    if (is_string($data['jenis_perawatan'])) {
+                        $jenisPerawatanIds = array_map('trim', explode(',', $data['jenis_perawatan']));
+                    } elseif (is_array($data['jenis_perawatan'])) {
+                        $jenisPerawatanIds = $data['jenis_perawatan'];
+                    }
+                }
 
-            if (!empty($jenisPerawatanIds)) {
-                $jenisPerawatanIds = array_values(array_filter($jenisPerawatanIds));
+                $pivotModel = new \App\Models\ServiceJenisPerawatanPivot();
+                $jenisModel = new \App\Models\JenisPerawatan();
 
                 if (!empty($jenisPerawatanIds)) {
-                    $jenisModel = new \App\Models\JenisPerawatan();
                     $foundJenis = $jenisModel
                         ->whereIn('id', $jenisPerawatanIds)
                         ->findAll();
@@ -235,29 +315,31 @@ class Service extends BaseController
                             ['jenis_perawatan_tidak_ditemukan' => array_values($missing)]
                         );
                     }
-
-                    $insertData = [];
-                    foreach ($jenisPerawatanIds as $jpId) {
-                        $insertData[] = [
-                            'service_id' => $id,
-                            'jenis_perawatan_id' => $jpId
-                        ];
-                    }
-                    $pivotModel->insertBatch($insertData);
                 }
+
+                $pivotModel->where('service_id', $id)->delete();
+                foreach ($jenisPerawatanIds as $jenisId) {
+                    $pivotModel->insert([
+                        'service_id' => $id,
+                        'jenis_perawatan_id' => $jenisId
+                    ]);
+                }
+
+                unset($data['jenis_perawatan']);
             }
 
-            $updatedService = $serviceModel->find($id);
-
-            $jenisPerawatanList = [];
-            if (!empty($jenisPerawatanIds)) {
-                $jenisModel = new \App\Models\JenisPerawatan();
-                $jenisPerawatanList = $jenisModel->whereIn('id', $jenisPerawatanIds)->findAll();
+            if (isset($data['total_harga']) && !empty($data['total_harga'])) {
+                $data['total_harga'] = preg_replace('/[^0-9.]/', '', $data['total_harga']);
             }
 
-            return responseSuccess("Data service berhasil diperbarui", [
-                'service' => $updatedService,
-                'jenis_perawatan' => $jenisPerawatanList
+            if (!$serviceModel->update($id, $data)) {
+                return responseError("Gagal mengupdate service", 400, $serviceModel->errors());
+            }
+
+            $updatedService = $serviceModel->getServiceWithRelations($id);
+
+            return responseSuccess("Service berhasil diupdate", [
+                'service' => $updatedService
             ]);
         } catch (\Throwable $th) {
             return responseInternalServerError($th->getMessage());
@@ -275,24 +357,68 @@ class Service extends BaseController
     {
         try {
             $pivotModel = new \App\Models\ServiceJenisPerawatanPivot();
-    
+
             if (!$id) {
                 return responseError("ID service tidak diberikan", 400);
             }
-    
+
             $service = $this->services->find($id);
             if (!$service) {
                 return responseError("Data service tidak ditemukan", 404);
             }
-    
+
             $pivotModel->where('service_id', $id)->delete();
-    
+
             $this->services->delete($id);
-    
+
             return responseSuccess("Data service berhasil dihapus", [
                 'deleted_id' => $id
             ]);
-    
+        } catch (\Throwable $th) {
+            return responseInternalServerError($th->getMessage());
+        }
+    }
+
+    public function uploadNota($serviceId)
+    {
+        try {
+            $serviceModel = new \App\Models\Services();
+            $service = $serviceModel->find($serviceId);
+
+            if (!$service) {
+                return responseError('Service tidak ditemukan.', 404);
+            }
+
+            $fotoNota = $this->request->getFile('foto_nota');
+            if (!$fotoNota || !$fotoNota->isValid()) {
+                return responseError('File foto nota tidak valid.', 400);
+            }
+
+            $allowedTypes = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+            $fileExtension = $fotoNota->getClientExtension();
+
+            if (!in_array(strtolower($fileExtension), $allowedTypes)) {
+                return responseError('Format file tidak didukung. Gunakan format: jpg, jpeg, png, gif, atau webp.', 400);
+            }
+
+            if ($fotoNota->getSize() > 2097152) {
+                return responseError('Ukuran file terlalu besar. Maksimal 2MB.', 400);
+            }
+
+            if ($service->foto_nota && file_exists(WRITEPATH . 'uploads/nota/' . $service->foto_nota)) {
+                unlink(WRITEPATH . 'uploads/nota/' . $service->foto_nota);
+            }
+
+            $newName = $fotoNota->getRandomName();
+            $fotoNota->move(WRITEPATH . 'uploads/nota', $newName);
+
+            $serviceModel->updateFotoNota($serviceId, $newName);
+
+            $updatedService = $serviceModel->getServiceWithRelations($serviceId);
+
+            return responseSuccess("Foto nota berhasil diupload", [
+                'service' => $updatedService
+            ]);
         } catch (\Throwable $th) {
             return responseInternalServerError($th->getMessage());
         }

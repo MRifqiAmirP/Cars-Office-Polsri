@@ -13,6 +13,7 @@ $routes->get('/calendar', 'Page::calendar');
 
 $routes->group('user', function($routes) {
     $routes->get('', 'PageUser::index');
+    $routes->get('service', 'PageUser::service');
 });
 
 // AUTH ROUTES

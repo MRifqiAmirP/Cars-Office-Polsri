@@ -51,11 +51,21 @@ class User extends BaseController
             if (!$user) {
                 return responseError('User tidak ditemukan', 404, "User tidak ditemukan");
             }
-
-            $cars = $user->getCars()[0] ?? null;
+    
+            $car = $user->getCars()[0] ?? null;
             $services = $user->getAllServices();
             $serviceRequests = $user->getServiceRequests();
-
+    
+            $serviceRequestData = array_map(function ($req) {
+                $bengkel = $req->getBengkel();
+                return [
+                    ...$req->toArray(),
+                    'nama_bengkel' => $bengkel?->nama_bengkel ?? null
+                ];
+            }, $serviceRequests);
+    
+            $serviceData = array_map(fn($s) => $s->toArrayWithRelations(), $services);
+    
             $data = [
                 'user' => [
                     'id' => $user->id,
@@ -68,11 +78,11 @@ class User extends BaseController
                     'created_at' => $user->created_at,
                     'updated_at' => $user->updated_at,
                 ],
-                'kendaraan' => $cars,
-                'service' => array_map(fn($s) => $s->toArray(), $services),
-                'service_request' => array_map(fn($r) => $r->toArray(), $serviceRequests),
+                'kendaraan' => $car,
+                'service' => $serviceData,
+                'service_request' => $serviceRequestData,
             ];
-
+    
             return responseSuccess('Data user ditemukan by ID', $data);
         } catch (\Throwable $th) {
             return responseInternalServerError($th->getMessage());
