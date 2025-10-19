@@ -68,6 +68,13 @@ $routes->group('api', function($routes) {
         $routes->post('create', 'API\ServiceRequest::create');
         $routes->post('update/(:num)', 'API\ServiceRequest::update/$1');
     });
+
+    $routes->group('peminjaman', function($routes) {
+        $routes->get('', 'API\Peminjaman::index');
+        $routes->get('(:num)', 'API\Peminjaman::show/$1');
+        $routes->post('create', 'API\Peminjaman::create');
+        $routes->post('update/(:num)', 'API\Peminjaman::update/$1');
+    });
 });
 
 // DEBUG - GET CSRF TOKEN

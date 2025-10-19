@@ -67,4 +67,9 @@ class Cars extends Entity
     {
         return $this->deleted_at ? $this->deleted_at->format('d/m/Y H:i') : null;
     }
+
+    public function getPeminjaman() {
+        $peminjamanModel =  new \App\Models\Peminjaman();
+        return $peminjamanModel->where('car_id', $this->attributes['id'])->findAll();
+    }
 }
