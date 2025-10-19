@@ -146,16 +146,14 @@ class Services extends Entity
             $data['kendaraan'] = $this->getCars();
             $data['jenis_perawatan'] = $this->getJenisPerawatanList();
 
-            // Gunakan method yang aman untuk bengkel
-            $data['mitra_bengkel'] = $this->getMitraBengkelArray(); // PASTI ARRAY
-            $data['nama_bengkel'] = $this->getNamaBengkel(); // STRING
+            $data['mitra_bengkel'] = $this->getMitraBengkelArray();
+            $data['nama_bengkel'] = $this->getNamaBengkel(); 
             $data['foto_nota_url'] = $this->getFotoNotaUrl();
             $data['has_foto_nota'] = $this->hasFotoNota();
             $data['jarak_tempuh'] = $this->getJarakTempuh();
             $data['total_harga_formatted'] = $this->getTotalHargaFormatted();
             $data['tanggal_formatted'] = $this->getTanggalFormatted();
         } catch (\Throwable $e) {
-            // Fallback jika ada error
             log_message('error', 'Error in toArrayWithRelations: ' . $e->getMessage());
             $data['mitra_bengkel'] = null;
             $data['nama_bengkel'] = 'Error loading bengkel';
