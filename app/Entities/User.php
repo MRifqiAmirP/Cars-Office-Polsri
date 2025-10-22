@@ -4,6 +4,7 @@ namespace App\Entities;
 
 use CodeIgniter\Entity\Entity;
 use \App\Models\ServiceRequest as ServiceRequestModel;
+use \App\Models\Services as ServiceModel;
 use \App\Models\Cars as CarModel;
 
 class User extends Entity
@@ -27,7 +28,7 @@ class User extends Entity
     public function getAllServices()
     {
         $carModel = new CarModel();
-        $serviceRequestModel = new ServiceRequestModel();
+        $serviceRequestModel = new ServiceModel();
 
         $cars = $carModel->where('user_id', $this->attributes['id'])->findAll();
 

@@ -17,8 +17,16 @@ class PageUser extends BaseController
         return view('pages/user/dashboard', $data);
     }
 
+    public function service() {
+        $data = [
+            'title' => 'Service',
+            'role' => $this->getUserRole()
+        ];
+        
+        return view('pages/user/service/service', $data);
+    }
+
     protected function getUserRole() {
-        // Contoh: ambil dari session
-        return session()->get('role') ?? 'guest';
+        return session()->get('role');
     }
 }

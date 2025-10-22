@@ -43,10 +43,15 @@ class Auth extends BaseController
             'nama'         => $user->nama,
             'email'        => $user->email,
             'no_handphone' => $user->no_handphone,
+<<<<<<< HEAD
             'role'      => $user->jabatan
+=======
+            'jabatan'      => $user->jabatan,
+            'role'         => $user->role
+>>>>>>> 540f18b7ba0e282322c9b0389c197ebb3c9672b6
         ]);
 
-        return responseSuccess('Login berhasil');
+        return responseSuccess('Login berhasil', $user->role);
     }
 
     public function logout(): ResponseInterface
@@ -72,7 +77,8 @@ class Auth extends BaseController
             'nama' => session('nama'),
             'email' => session('email'),
             'no_handphone' => session('no_handphone'),
-            'jabatan' => session('jabatan')
+            'jabatan' => session('jabatan'),
+            'user'  => session('role')
         ]);
     }
 

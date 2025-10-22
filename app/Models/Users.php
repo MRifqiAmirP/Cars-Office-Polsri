@@ -9,7 +9,7 @@ class Users extends Model
     protected $table            = 'users';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
-    protected $returnType       = \App\Entities\Cars::class;
+    protected $returnType       = \App\Entities\User::class;
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
     protected $allowedFields    = [
@@ -18,6 +18,7 @@ class Users extends Model
         "email",
         "no_handphone",
         "jabatan",
+        "role",
         "password"
     ];
 
@@ -36,14 +37,40 @@ class Users extends Model
 
     // Validation
     protected $validationRules      = [
-        'nip' => 'required|is_unique[users.nip,id,{id}]',
+        'nip' => 'required|max_length[20]',
         'nama' => 'required',
-        'email' => 'permit_empty|valid_email|is_unique[users.email,id,{id}]',
-        'no_handphone' => 'permit_empty|is_unique[users.no_handphone,id,{id}]',
+        'email' => 'permit_empty|valid_email',
+        'no_handphone' => 'permit_empty|max_length[15]',
         'jabatan' => 'required',
+        'role' => 'required|in_list[superuser,admin,user,ppk,wadir]',
         'password' => 'required|min_length[6]'
     ];
-    protected $validationMessages   = [];
+    protected $validationMessages   = [
+        'nip' => [
+            'required' => 'NIP harus diisi',
+            'max_length' => 'NIP maksimal 20 karakter'
+        ],
+        'nama' => [
+            'required' => 'Nama harus diisi',
+        ],
+        'email' => [
+            'valid_email' => 'Format email tidak valid',
+        ],
+        'no_handphone' => [
+            'max_length' => 'Nomor handphone maksimal 15 digit'
+        ],
+        'jabatan' => [
+            'required' => 'Jabatan harus diisi',
+        ],
+        'role' => [
+            'required' => 'Role harus diisi',
+            'in_list' => 'Role yang dipilih tidak valid'
+        ],
+        'password' => [
+            'required' => 'Password harus diisi',
+            'min_length' => 'Password minimal 6 karakter'
+        ]
+    ];
     protected $skipValidation       = false;
     protected $cleanValidationRules = true;
 
@@ -75,7 +102,7 @@ class Users extends Model
                     users.email,
                     users.no_handphone,
                     users.jabatan,
-                    users.password,
+                    users.role,
                     users.created_at,
                     users.updated_at,
                     cars.id as car_id,
@@ -101,11 +128,11 @@ class Users extends Model
                     users.email,
                     users.no_handphone,
                     users.jabatan,
-                    users.password,
+                    users.role,
                     users.created_at,
                     users.updated_at,
-                    cars.id as car_id,
                     cars.nopol,
+                    cars.foto_kendaraan,
                     cars.merk,
                     cars.type,
                     cars.no_bpkb,
@@ -117,6 +144,17 @@ class Users extends Model
             ->join('cars', 'cars.user_id = users.id', 'left')
             ->where('users.id', $id)
             ->first();
+    }
+
+    public function getRoleOptions()
+    {
+        return [
+            'superuser' => 'Super User',
+            'admin' => 'Administrator',
+            'user' => 'Dosen',
+            'ppk' => 'PPK',
+            'wadir' => 'Wakil Direktur 2'
+        ];
     }
 
     // protected function hashPassword(array $data)

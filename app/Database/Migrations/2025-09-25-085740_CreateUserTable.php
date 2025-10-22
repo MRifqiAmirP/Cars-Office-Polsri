@@ -40,6 +40,11 @@ class CreateUserTable extends Migration
                 'constraint' => 100,
                 'null'       => false,
             ],
+            'role' => [
+                'type' => 'ENUM',
+                'constraint' => ['superuser', 'admin', 'user', 'ppk', 'wadir'],
+                'default' => 'user'
+            ],
             'password' => [
                 'type'       => 'VARCHAR',
                 'constraint' => 255,

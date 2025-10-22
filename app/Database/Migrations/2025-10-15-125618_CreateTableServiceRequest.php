@@ -36,7 +36,7 @@ class CreateTableServiceRequest extends Migration
                 'null' => false,
             ],
             'status' => [
-                'type' => 'ENUM("pending", "proses", "selesai")',
+                'type' => 'ENUM("pending", "waiting", "proses", "selesai")',
                 'default' => 'pending',
             ],
             'file' => [

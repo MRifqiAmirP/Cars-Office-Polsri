@@ -69,6 +69,12 @@ class ServiceRequest extends Entity
         return $bengkelModel->find($this->attributes['bengkel_id']);
     }
 
+    public function getBengkelNama()
+    {
+        $bengkel = $this->getBengkel();
+        return $bengkel ? $bengkel->nama_bengkel : '-';
+    }
+
     public function getStatusLabel()
     {
         switch ($this->attributes['status']) {

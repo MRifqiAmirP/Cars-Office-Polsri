@@ -14,6 +14,7 @@ $routes->get('/calendar', 'Page::calendar');
 // USER ROUTES
 $routes->group('user', function($routes) {
     $routes->get('', 'PageUser::index');
+    $routes->get('service', 'PageUser::service');
 });
 
 // AUTH ROUTES
@@ -69,6 +70,13 @@ $routes->group('api', function($routes) {
         $routes->get('(:num)', 'API\ServiceRequest::show/$1');
         $routes->post('create', 'API\ServiceRequest::create');
         $routes->post('update/(:num)', 'API\ServiceRequest::update/$1');
+    });
+
+    $routes->group('peminjaman', function($routes) {
+        $routes->get('', 'API\Peminjaman::index');
+        $routes->get('(:num)', 'API\Peminjaman::show/$1');
+        $routes->post('create', 'API\Peminjaman::create');
+        $routes->post('update/(:num)', 'API\Peminjaman::update/$1');
     });
 });
 

@@ -18,7 +18,11 @@ class Page extends Controller
         $data = [
             'title' => 'Dashboard',
             'css' => 'dashboard.css',
+<<<<<<< HEAD
             'role' => $this->getUserRole(),
+=======
+            'role' => $this->getUserRole()
+>>>>>>> 540f18b7ba0e282322c9b0389c197ebb3c9672b6
         ];
         return view('pages/index', $data);
     }
@@ -32,5 +36,9 @@ class Page extends Controller
     {
         $data = ['title' => 'Calendar'];
         return view('pages/calendar', $data);
+    }
+
+    protected function getUserRole() {
+        return session()->get('role') ?? 'guest';
     }
 }

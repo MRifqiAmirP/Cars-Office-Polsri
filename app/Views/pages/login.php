@@ -392,15 +392,22 @@
 			let formData = new FormData(form);
 
 			try {
-				let response = await fetch("<?= base_url('/auth/login'); ?>", {
+				let response = await fetch("/auth/login", {
 					method: "POST",
-					body: formData
+					body: formData,
 				});
 
 				let result = await response.json();
 
 				if (result.statusCode === 200) {
-					window.location.href = "<?= base_url('/'); ?>";
+					const redirectPaths = {
+						'admin': '/',
+						'superuser': '/',
+						'user': '/user'
+					};
+
+					const redirectPath = redirectPaths[result.data];
+					window.location.href = redirectPath;
 				} else {
 					Swal.fire({
 						toast: true,
