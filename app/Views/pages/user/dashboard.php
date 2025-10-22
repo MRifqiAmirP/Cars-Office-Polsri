@@ -192,7 +192,7 @@
                     tabelServis.innerHTML = `
                     <tr>
                     <td>${srv.tanggal || '-'}</td>
-                    <td>${srv.mitra_bengkel.nama_bengkel}</td>
+                    <td>${srv.nama_bengkel}</td>
                     <td>
                         ${srv.jenis_perawatan && srv.jenis_perawatan.length > 0 
                         ? srv.jenis_perawatan.map(j => j.jenis_perawatan).join(', ')
