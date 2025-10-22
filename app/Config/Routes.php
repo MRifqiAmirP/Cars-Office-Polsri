@@ -11,6 +11,7 @@ $routes->get('/', 'Page::index', ['filter' => 'auth']);
 $routes->get('/login', 'Page::login');
 $routes->get('/calendar', 'Page::calendar');
 
+// USER ROUTES
 $routes->group('user', function($routes) {
     $routes->get('', 'PageUser::index');
 });
@@ -22,13 +23,15 @@ $routes->group('auth', function($routes) {
     $routes->get('me', 'API\Auth::me', ['filter' => 'auth']);
 });
 
-$routes->group('master/user', ['filter' => ['auth', 'refreshSession']], function($routes){
+$routes->group('master/user', ['filter' => ['auth', 'refreshSession']], function($routes) {
     $routes->get('', 'API\User::index');
     $routes->get('(:num)', 'API\User::show/$1');
+    $routes->get('edit/(:num)', 'API\User::edit/$1');
     $routes->post('create', 'API\User::create');
     $routes->post('update/(:num)', 'API\User::update/$1');
     $routes->delete('(:num)', 'API\User::delete/$1');
 });
+
 
 $routes->group('api', function($routes) {
     $routes->group('cars', function($routes) {

@@ -10,6 +10,7 @@ use App\Models\Cars as CarsModel;
 class Cars extends BaseController
 {
     protected $cars;
+
     /**
      * Return an array of resource objects, themselves in array format.
      *
@@ -22,15 +23,23 @@ class Cars extends BaseController
 
     public function index()
     {
-        try {
-            $result = $this->cars->getAllCarsWithUser();
-            return responseSuccess(
-                'Data mobil',
-                $result
-            );
-        } catch (\Throwable $th) {
-            return responseInternalServerError($th->getMessage());
-        }
+        // Instantiate Users model
+        $usersModel = new \App\Models\Users();
+
+        $result = $this->cars->getAllCarsWithUser(); // existing cars data
+        $users  = $usersModel->findAll(); // fetch all users
+
+        return view('pages/api/mobil', [
+            'result' => $result,
+            'users'  => $users,
+            'role'   => $this->getUserRole(),
+            'title'  => 'Dashboard',
+        ]);
+    }
+
+    protected function getUserRole() {
+        // Contoh: ambil dari session
+        return session()->get('role') ?? 'guest';
     }
 
     /**

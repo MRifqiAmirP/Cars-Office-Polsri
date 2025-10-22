@@ -43,7 +43,7 @@ class Auth extends BaseController
             'nama'         => $user->nama,
             'email'        => $user->email,
             'no_handphone' => $user->no_handphone,
-            'jabatan'      => $user->jabatan
+            'role'      => $user->jabatan
         ]);
 
         return responseSuccess('Login berhasil');

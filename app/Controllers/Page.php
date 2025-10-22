@@ -17,9 +17,15 @@ class Page extends Controller
     {
         $data = [
             'title' => 'Dashboard',
-            'css' => 'dashboard.css'
+            'css' => 'dashboard.css',
+            'role' => $this->getUserRole(),
         ];
         return view('pages/index', $data);
+    }
+
+        protected function getUserRole() {
+        // Contoh: ambil dari session
+        return session()->get('role') ?? 'guest';
     }
 
     public function calendar()

@@ -16,27 +16,25 @@ class User extends BaseController
      * @return ResponseInterface
      */
 
-    public function __construct()
+     function __construct()
     {
         $this->users = new Users();
     }
 
-    public function index()
+     function index()
     {
-        try {
             // $data = $this->users->findAll();
-            $data = $this->users->getUsersWithCars();
+        return view('pages/master/users', [
+            'data' => $this->users->getUsersWithCars(),
+            'role'  => $this->getUserRole(),
+            'title' => 'Dashboard',
+        ]);
 
-            if (empty($data)) {
-                return responseError('Data user belum diisi', 200);
-            }
-
-            return responseSuccess('Data user', $data);
-        } catch (\Throwable $th) {
-            return responseInternalServerError($th);
-        }
     }
-
+    protected function getUserRole() {
+        // Contoh: ambil dari session
+        return session()->get('role') ?? 'guest';
+    }
     /**
      * Return the properties of a resource object.
      *
@@ -44,7 +42,7 @@ class User extends BaseController
      *
      * @return ResponseInterface
      */
-    public function show($id = null)
+    function show($id = null)
     {
         try {
             $data = $this->users->getUserIdWithCars($id);
@@ -62,17 +60,13 @@ class User extends BaseController
      *
      * @return ResponseInterface
      */
-    public function new()
-    {
-        //
-    }
 
     /**
      * Create a new resource object, from "posted" parameters.
      *
      * @return ResponseInterface
      */
-    public function create()
+    function create()
     {
         try {
             $input = $this->request->getPost([
@@ -124,8 +118,19 @@ class User extends BaseController
      */
     public function edit($id = null)
     {
-        //
+        $user = $this->users->find($id);
+
+        if (!$user) {
+            return redirect()->to(base_url('master/user'))->with('error', 'User tidak ditemukan');
+        }
+
+        return view('pages/master/editUsers', [
+            'user' => $user,
+            'role'  => $this->getUserRole(),
+            'title' => 'Dashboard',
+        ]);
     }
+
 
     /**
      * Add or update a model resource, from "posted" properties.
@@ -134,28 +139,44 @@ class User extends BaseController
      *
      * @return ResponseInterface
      */
-    public function update($id = null)
-    {
-        try {
-            $input = $this->request->getPost();
+public function update($id = null)
+{
+    $this->users->setValidationRules([
+        'nip'          => 'required|is_unique[users.nip,id,'.$id.']',
+        'email'        => 'permit_empty|valid_email|is_unique[users.email,id,'.$id.']',
+        'no_handphone' => 'permit_empty|is_unique[users.no_handphone,id,'.$id.']',
+    ]);
 
-            if (empty($input)) {
-                return responseError('Tidak ada data input untuk update', 400, 'Input kosong');
-            }
+    try {
+        $input = $this->request->getPost();
 
-            if (!$this->users->find($id)) {
-                return responseError('User dengan ID ' . $id . ' tidak ditemukan', 404, 'User tidak ditemukan');
-            }
-
-            if (!$this->users->update($id, $input)) {
-                return responseError('Gagal update data user', 400, $this->users->errors());
-            }
-
-            return responseSuccess('User updated successfully', ['id' => $id]);
-        } catch (\Throwable $th) {
-            return responseInternalServerError($th);
+        if (empty($input)) {
+            return responseError('Tidak ada data input untuk update', 400, 'Input kosong');
         }
+
+        $user = $this->users->find($id);
+        if (!$user) {
+            return responseError('User dengan ID ' . $id . ' tidak ditemukan', 404, 'User tidak ditemukan');
+        }
+
+        // Handle password update (optional)
+        if (empty($input['password'])) {
+            unset($input['password']);
+        } else {
+            $input['password'] = password_hash($input['password'], PASSWORD_DEFAULT);
+        }
+
+        if (!$this->users->update($id, $input)) {
+            return responseError('Gagal update data user', 400, $this->users->errors());
+        }
+
+        return responseSuccess('User updated successfully', ['id' => $id]);
+
+    } catch (\Throwable $th) {
+        return responseInternalServerError($th);
     }
+}
+
 
     /**
      * Delete the designated resource object from the model.
@@ -164,7 +185,7 @@ class User extends BaseController
      *
      * @return ResponseInterface
      */
-    public function delete($id = null)
+     function delete($id = null)
     {
         //
     }
