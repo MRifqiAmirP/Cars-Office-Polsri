@@ -441,6 +441,21 @@
 				});
 			}
 		});
+
+		document.addEventListener('DOMContentLoaded', function() {
+			const session = <?php echo json_encode($_SESSION); ?>;
+			
+			if (session.isLoggedIn) {
+				const role = session.role;
+				const redirectPaths = {
+					'admin': '/',
+					'user': '/user'
+				}
+
+				const redirectPath = redirectPaths[role]
+				window.location.href = redirectPath
+			}
+		})
 	</script>
 </body>
 
