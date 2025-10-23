@@ -137,8 +137,7 @@
         throw error;
       }
     }
-
-    // Override jQuery AJAX untuk konsistensi
+    
     if (typeof jQuery !== 'undefined') {
       $(document).ajaxSend(function(event, xhr, settings) {
         xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
