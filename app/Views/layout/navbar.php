@@ -11,7 +11,7 @@
         </button>
 
         <div class="navbar-header pull-left">
-            <a href="<?= base_url('/') ?>" class="navbar-brand">
+            <a href="<?= session()->get('role') == 'admin' ? base_url('/') : base_url('/user') ?>" class="navbar-brand">
                 <small>
                     <i class="fa fa-leaf"></i>
                     Cars Office POLSRI
