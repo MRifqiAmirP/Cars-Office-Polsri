@@ -35,8 +35,9 @@ class Filters extends BaseFilters
         'pagecache'     => PageCache::class,
         'performance'   => PerformanceMetrics::class,
         'auth'          => \App\Filters\AuthFilter::class,
-        'sessionTimeout' => \App\Filters\SessionTimeout::class,
         'refreshSession' => \App\Filters\RefreshSession::class,
+        'asAdmin'       => \App\Filters\AsAdminFilter::class,
+        'asUser'        => \App\Filters\AsUserFilter::class
     ];
 
     /**

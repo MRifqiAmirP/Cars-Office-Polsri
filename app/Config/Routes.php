@@ -7,11 +7,19 @@ use CodeIgniter\Router\RouteCollection;
  */
 
 // MAIN PAGE ROUTES
-$routes->get('/', 'Page::index', ['filter' => 'auth']);
+$routes->get('/', 'Page::index', ['filter' => ['auth', 'asAdmin', 'refreshSession']]);
 $routes->get('/login', 'Page::login');
 
+// PAGE ADMIN ROUTES
+$routes->group('admin', ['filter' => ['auth', 'asAdmin', 'refreshSession']], function($routes) {
+    $routes->group('master', function($routes) {
+        $routes->get('user', 'Page::user');
+        $routes->get('user/form', 'Page::userForm'); 
+    });
+});
+
 // PAGE USER ROUTES
-$routes->group('user', ['filter' => 'refreshSession'], function($routes) {
+$routes->group('user', ['filter' => ['auth', 'asUser', 'refreshSession']], function($routes) {
     $routes->get('', 'PageUser::index');
     $routes->get('service', 'PageUser::service');
 });
