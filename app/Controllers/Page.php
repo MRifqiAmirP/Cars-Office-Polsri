@@ -23,10 +23,13 @@ class Page extends Controller
         return view('pages/index', $data);
     }
 
-    public function calendar()
-    {
-        $data = ['title' => 'Calendar'];
-        return view('pages/calendar', $data);
+    public function user() {
+        $data = [
+            'title' => 'User Management',
+            'role' => $this->getUserRole()
+        ];
+
+        return view('pages/admin/user/user', $data);
     }
 
     protected function getUserRole() {
