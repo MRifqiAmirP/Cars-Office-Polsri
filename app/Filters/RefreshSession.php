@@ -25,7 +25,13 @@ class RefreshSession implements FilterInterface
      */
     public function before(RequestInterface $request, $arguments = null)
     {
-        session()->setTempdata('lastActivity', time(), 3600);
+        $lastActivity = session()->getTempdata('lastActivity');
+
+        if ($lastActivity && (time() - $lastActivity > 1800)) {
+            return redirect()->to('/auth/logout')->with('message', 'Sesi berakhir karena tidak aktif.');
+        }
+
+        session()->setTempdata('lastActivity', time(), 1800);
     }
 
     /**
