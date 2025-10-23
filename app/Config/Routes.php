@@ -6,12 +6,12 @@ use CodeIgniter\Router\RouteCollection;
  * @var RouteCollection $routes
  */
 
-// PAGE ROUTES
+// MAIN PAGE ROUTES
 $routes->get('/', 'Page::index', ['filter' => 'auth']);
 $routes->get('/login', 'Page::login');
-$routes->get('/calendar', 'Page::calendar');
 
-$routes->group('user', function($routes) {
+// PAGE USER ROUTES
+$routes->group('user', ['filter' => 'refreshSession'], function($routes) {
     $routes->get('', 'PageUser::index');
     $routes->get('service', 'PageUser::service');
 });
