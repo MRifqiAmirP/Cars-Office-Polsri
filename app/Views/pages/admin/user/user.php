@@ -85,7 +85,6 @@
 		</div>
 	</div>
 
-	<!-- Tabel User -->
 	<div class="table-responsive" style="margin-top:20px;">
 		<table class="table table-bordered table-hover">
 			<thead>
@@ -158,9 +157,11 @@
 				<td>${user.email || '-'}</td>
 				<td>${user.no_handphone || '-'}</td>
 				<td>${user.jabatan || '-'}</td>
-				<td>
-					<button class="btn btn-xs btn-primary">Edit</button>
-					<button class="btn btn-xs btn-danger">Hapus</button>
+				<td class="text-center">
+					<div class="btn-group">
+						<button class="btn btn-xs btn-primary" style="margin-right: 8px;">Edit</button>
+						<button class="btn btn-xs btn-danger" style="margin-left: 8px;">Hapus</button>
+					</div>
 				</td>
 			</tr>
 		`).join('');
