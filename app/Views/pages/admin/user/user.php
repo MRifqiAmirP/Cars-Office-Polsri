@@ -25,8 +25,8 @@
 		<div class="modal-dialog" role="document">
 			<div class="modal-content">
 
-				<form action="<?= base_url('master/user/create') ?>" method="post">
-					<?= csrf_field() ?>
+				<form id="formUser">
+					<input type="hidden" name="csrf" value="<?= csrf_hash(); ?>">
 					<div class="modal-header">
 						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 							<span>&times;</span>
@@ -56,23 +56,28 @@
 						</div>
 
 						<div class="form-group">
-							<label for="jabatan">Jabatan</label>
-							<select id="jabatan" name="jabatan" class="form-control" required>
-								<option value="" selected disabled>Pilih Jabatan</option>
+							<label for="role">Role</label>
+							<select id="role" name="role" class="form-control" required>
+								<option value="" selected disabled>Pilih Role</option>
 								<option value="Superuser">Superuser</option>
-								<option value="admin">Admin</option>
-								<option value="dosen">Dosen</option>
+								<option value="Admin">Admin</option>
+								<option value="User">Dosen</option>
 							</select>
 						</div>
 
-						<div class="form-group">
+						<div id="jabatanGroup" class="form-group hidden">
+							<label for="jabatan">Jabatan</label>
+							<input type="text" id="jabatan" class="form-control" name="jabatan" placeholder="Masukkan jabatan">
+						</div>
+
+						<div class="form-group" id="passwordGroup">
 							<label for="password">Password</label>
 							<input type="password" class="form-control" id="password" name="password" placeholder="Masukkan password" required>
 						</div>
 					</div>
 
 					<div class="modal-footer">
-						<button type="submit" class="btn btn-success">
+						<button id="saveButton" type="submit" class="btn btn-success">
 							<i class="glyphicon glyphicon-floppy-disk"></i> Simpan
 						</button>
 						<button type="button" class="btn btn-default" data-dismiss="modal">
@@ -107,24 +112,28 @@
 <?= $this->endSection(); ?>
 
 <?= $this->section('scripts'); ?>
-<script>
-	(() => {
-		'use strict';
-		const forms = document.querySelectorAll('.needs-validation');
-		Array.from(forms).forEach(form => {
-			form.addEventListener('submit', event => {
-				if (!form.checkValidity()) {
-					event.preventDefault();
-					event.stopPropagation();
-				}
-				form.classList.add('was-validated');
-			}, false);
-		});
-	})();
-</script>
 <script type="text/javascript">
 	if ('ontouchstart' in document.documentElement)
 		document.write("<script src='<?= '/assets/js/jquery.mobile.custom.min.js'; ?>'>" + "<" + "/script>");
+</script>
+
+<script>
+	document.addEventListener('DOMContentLoaded', function() {
+		const roleSelect = document.getElementById('role');
+		const jabatanGroup = document.getElementById('jabatanGroup');
+		const jabatanInput = document.getElementById('jabatan');
+
+		roleSelect.addEventListener('change', function() {
+			if (this.value === 'User') {
+				jabatanGroup.classList.remove('hidden');
+				jabatanInput.setAttribute('required', 'required');
+			} else {
+				jabatanGroup.classList.add('hidden');
+				jabatanInput.removeAttribute('required');
+				jabatanInput.value = '';
+			}
+		});
+	})
 </script>
 
 <script>
@@ -159,7 +168,7 @@
 				<td>${user.jabatan || '-'}</td>
 				<td class="text-center">
 					<div class="btn-group">
-						<button class="btn btn-xs btn-primary" style="margin-right: 8px;">Edit</button>
+						<button type="button" onClick="edit(${user.id})" class="btn btn-xs btn-primary" style="margin-right: 8px;">Edit</button>
 						<button class="btn btn-xs btn-danger" style="margin-left: 8px;">Hapus</button>
 					</div>
 				</td>
@@ -179,4 +188,187 @@
 	})
 </script>
 
+<script>
+	document.getElementById('formUser').addEventListener('submit', async function(e) {
+		e.preventDefault()
+
+		const formData = new FormData(this)
+		const role = formData.get('role').toLowerCase()
+
+		if (formData.get('role') !== 'User') {
+			formData.set('jabatan', formData.get('role'))
+		}
+
+		formData.set('role', role)
+
+		const data = {
+			csrf_cookie: formData.get('csrf'),
+		}
+		formData.delete('csrf')
+
+		try {
+			const response = await fetch('/master/user/create', {
+				method: 'POST',
+				headers: {
+					'X-CSRF-TOKEN': data.csrf_cookie
+				},
+				body: formData
+			})
+
+			const result = await response.json()
+
+			if (result.status === 'success') {
+				Swal.fire({
+					icon: 'success',
+					title: 'Berhasil!',
+					text: 'User berhasil ditambahkan',
+					confirmButtonColor: '#28a745',
+					showCancelButton: false,
+					confirmButtonText: 'OK'
+				}).then((result) => {
+					if (result.isConfirmed) {
+						location.reload()
+					}
+				})
+			} else {
+				Swal.fire({
+					icon: 'error',
+					title: 'Gagal Menambahkan User',
+					text: result.message || 'Unknown error',
+					confirmButtonColor: '#d33'
+				})
+			}
+		} catch (error) {
+			console.error('Error: ', error)
+			Swal.fire({
+				toast: true,
+				icon: 'error',
+				title: 'Gagal Menambahkan User',
+				text: error.message,
+				position: 'bottom-end',
+				showConfirmButton: false,
+				timer: 5000,
+				timerProgressBar: true
+			})
+		}
+	})
+</script>
+
+<script>
+	async function edit(id) {
+		const url = `/master/user/${id}`;
+		document.getElementById('modalTambahUserLabel').innerHTML = 'Edit User';
+
+		try {
+			const result = await fetch(url);
+			const response = await result.json();
+			const userData = response.data.user;
+
+			const role = toRoleCase(userData.role);
+
+			if (userData && typeof userData === 'object') {
+				document.getElementById('passwordGroup').style.display = 'none';
+				document.getElementById('saveButton').setAttribute('onclick', `update(${id})`)
+				document.getElementById('saveButton').setAttribute('type', 'button')
+				toggleJabatanField(userData.role);
+
+				document.getElementById('nip').value = userData.nip || '';
+				document.getElementById('nama').value = userData.nama || '';
+				document.getElementById('email').value = userData.email || '';
+				document.getElementById('no_handphone').value = userData.no_handphone || '';
+				document.getElementById('role').value = role || '';
+				document.getElementById('jabatan').value = userData.jabatan || '';
+
+				$('#modalTambahUser').modal('show');
+			} else {
+				console.error('Invalid response format:', response);
+				alert('Gagal memuat data user');
+			}
+
+		} catch (error) {
+			console.error('Gagal memuat data:', error);
+			alert('Terjadi kesalahan saat memuat data');
+		}
+	}
+
+	function toggleJabatanField(role) {
+		const jabatanGroup = document.getElementById('jabatanGroup');
+		if (role === 'user') {
+			jabatanGroup.classList.remove('hidden');
+		} else {
+			jabatanGroup.classList.add('hidden');
+		}
+	}
+
+	function toRoleCase(str) {
+		return str.split(' ')
+			.map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+			.join(' ');
+	}
+</script>
+
+<script>
+	async function update(id) {
+		const url = `/master/user/update/${id}`
+		const formData = new FormData(document.getElementById('formUser'))
+
+		const data = {
+			csrf_cookie: formData.get('csrf')
+		}
+		formData.delete('csrf')
+
+		if (formData.get('role') !== 'User') {
+			formData.set('jabatan', formData.get('role'))
+		}
+
+		const role = formData.get('role').toLowerCase()
+		formData.set('role', role)
+
+		try {
+			const response = await fetch(url, {
+				method: 'POST',
+				headers: {
+					'X-CSRF-TOKEN': data.csrf_cookie
+				},
+				body: formData
+			})
+
+			const result = await response.json()
+
+			if (result.status === 'success') {
+				Swal.fire({
+					icon: 'success',
+					title: 'Berhasil!',
+					text: 'User berhasil diupdate',
+					confirmButtonColor: '#28a745',
+					showCancelButton: false,
+					confirmButtonText: 'OK'
+				}).then((result) => {
+					if (result.isConfirmed) {
+						location.reload()
+					}
+				})
+			} else {
+				Swal.fire({
+					icon: 'error',
+					title: 'Gagal update User',
+					text: result.message || 'Unknown error',
+					confirmButtonColor: '#d33'
+				})
+			}
+		} catch (error) {
+			console.error('Error: ', error)
+			Swal.fire({
+				toast: true,
+				icon: 'error',
+				title: 'Gagal update User',
+				text: error.message,
+				position: 'bottom-end',
+				showConfirmButton: false,
+				timer: 5000,
+				timerProgressBar: true
+			})
+		}
+	}
+</script>
 <?= $this->endSection(); ?>
