@@ -68,7 +68,7 @@
                 </li>
 
                 <li class="">
-                    <a href="typography.html">
+                    <a href="<?= base_url('/admin/master/cars'); ?>">
                         <i class="menu-icon fa fa-caret-right"></i>
                         Cars
                     </a>

@@ -32,6 +32,15 @@ class Page extends Controller
         return view('pages/admin/user/user', $data);
     }
 
+    public function cars() {
+        $data = [
+            'title' => 'Car Managemenet',
+            'role' => $this->getUserRole()
+        ];
+
+        return view('pages/admin/cars/cars', $data);
+    }
+
     protected function getUserRole() {
         return session()->get('role') ?? 'guest';
     }

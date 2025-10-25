@@ -14,7 +14,7 @@ $routes->get('/login', 'Page::login');
 $routes->group('admin', ['filter' => ['auth', 'asAdmin', 'refreshSession']], function($routes) {
     $routes->group('master', function($routes) {
         $routes->get('user', 'Page::user');
-        $routes->get('user/form', 'Page::userForm'); 
+        $routes->get('cars', 'Page::cars');
     });
 });
 
