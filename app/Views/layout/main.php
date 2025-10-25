@@ -43,6 +43,9 @@
   <!-- AXIOS -->
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
+  <!-- SWEET ALERT 2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
   <!-- Custom CSS -->
   <?php if (isset($css) && $css !== ''): ?>
     <link rel="stylesheet" href="assets/css/custom/<?= $css; ?>" />
@@ -138,7 +141,6 @@
       }
     }
 
-    // Override jQuery AJAX untuk konsistensi
     if (typeof jQuery !== 'undefined') {
       $(document).ajaxSend(function(event, xhr, settings) {
         xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');

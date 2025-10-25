@@ -150,8 +150,13 @@ class User extends BaseController
      */
     public function update($id)
     {
+        $this->validate([
+            'password' => 'permit_empty'
+        ]);
+
         try {
             $input = $this->request->getPost();
+            unset($input['password']);
 
             $duplicateCheck = $this->checkForDuplicates($input, $id);
             if ($duplicateCheck !== true) {
