@@ -6,7 +6,7 @@ use CodeIgniter\Filters\FilterInterface;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 
-class SessionTimeout implements FilterInterface
+class AsUserFilter implements FilterInterface
 {
     /**
      * Do whatever processing this filter needs to do.
@@ -24,18 +24,17 @@ class SessionTimeout implements FilterInterface
      * @return RequestInterface|ResponseInterface|string|void
      */
     public function before(RequestInterface $request, $arguments = null)
-    {
-        if (!session()->get('isLoggedIn')) {
-            return responseError('', 401, 'Unauthorized');
-        }
+    {   
+        $isLoggedIn = session()->get('isLoggedIn');
+        $role = session()->get('role');
 
-        $timeout = 3600;
-        if (session()->get('lastActivity') && (time() - session()->get('lastActivity') > $timeout)) {
-            session()->destroy();
-            return responseError('', 401, 'Session expired');
+        if($isLoggedIn && $role == 'user') {
+            return;
+        } else if($isLoggedIn && $role == 'admin') {
+            return redirect()->to(base_url(''));
+        } else {
+            return redirect()->to(base_url('auth/logout'));
         }
-
-        session()->set('lastActivity', time());
     }
 
     /**

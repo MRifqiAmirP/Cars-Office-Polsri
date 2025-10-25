@@ -6,7 +6,7 @@ use CodeIgniter\Filters\FilterInterface;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 
-class RefreshSession implements FilterInterface
+class AsAdminFilter implements FilterInterface
 {
     /**
      * Do whatever processing this filter needs to do.
@@ -25,13 +25,16 @@ class RefreshSession implements FilterInterface
      */
     public function before(RequestInterface $request, $arguments = null)
     {
-        $lastActivity = session()->getTempdata('lastActivity');
+        $isLoggedIn = session()->get('isLoggedIn');
+        $role = session()->get('role');
 
-        if ($lastActivity && (time() - $lastActivity > 1800)) {
-            return redirect()->to('/auth/logout')->with('message', 'Sesi berakhir karena tidak aktif.');
+        if ($isLoggedIn && $role == 'admin') {
+            return;
+        } else if ($isLoggedIn && $role == 'user') {
+            return redirect()->to(base_url('user'));
+        } else {
+            return redirect()->to(base_url('auth/logout'));
         }
-
-        session()->setTempdata('lastActivity', time(), 1800);
     }
 
     /**

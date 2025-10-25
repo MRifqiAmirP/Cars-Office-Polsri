@@ -43,6 +43,9 @@
   <!-- AXIOS -->
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
+  <!-- SWEET ALERT 2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
   <!-- Custom CSS -->
   <?php if (isset($css) && $css !== ''): ?>
     <link rel="stylesheet" href="assets/css/custom/<?= $css; ?>" />
@@ -138,7 +141,6 @@
       }
     }
 
-    // Override jQuery AJAX untuk konsistensi
     if (typeof jQuery !== 'undefined') {
       $(document).ajaxSend(function(event, xhr, settings) {
         xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
@@ -156,80 +158,6 @@
       });
     }
   </script>
-
-  <!-- <script>
-    const api = axios.create({
-      baseURL: '<?= base_url(); ?>',
-      withCredentials: true
-    })
-
-    api.interceptors.response.use(
-      response => response,
-      error => {
-        if (error.response.status === 401) {
-          localStorage.removeItem('user')
-          sessionStorage.removeItem('user')
-
-          showNotification('warning', 'Sesi telah habis, silahkan login kembali')
-
-          setTimeout(() => {
-            window.location.href = '<?= base_url('/login'); ?>'
-          }, 1500)
-
-          return Promise.reject(error)
-        }
-        return Promise.reject(error)
-      }
-    )
-
-    function showNotification(type, message) {
-      alert(message)
-    }
-
-    async function checkAuthStatus() {
-      try {
-        const response = await api.get('/auth/me')
-        return response.data
-      } catch (error) {
-        console.error('Auth check error:', error)
-        throw error
-      }
-    }
-
-    async function logout() {
-      try {
-        await api.post('/auth/logout')
-        localStorage.removeItem('user')
-        sessionStorage.removeItem('user')
-        window.location.href = '<?= base_url('/login'); ?>'
-      } catch (error) {
-        console.error('Logout error:', error)
-        window.location.href = '<?= base_url('/login'); ?>'
-      }
-    }
-
-    function updateUIForLoggedInUser(user) {
-      const userElement = document.querySelector('.user-info')
-      if (userElement && user.name) {
-        userElement.textContent = user.name
-      }
-
-      const roleElement = document.querySelector('.user-role')
-      if (roleElement && user.role) {
-        roleElement.textContent = user.role
-      }
-    }
-
-    document.addEventListener('DOMContentLoaded', function() {
-      if (!window.location.pathname.includes('/login')) {
-        checkAuthStatus().then(user => {
-          updateUIForLoggedInUser(user)
-        }).catch(error => {
-
-        })
-      }
-    })
-  </script> -->
 
   <!-- JS -->
   <script src="<?= base_url('assets/js/jquery-2.1.4.min.js') ?>"></script>
