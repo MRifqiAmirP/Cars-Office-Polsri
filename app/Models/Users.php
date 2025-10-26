@@ -157,6 +157,11 @@ class Users extends Model
         ];
     }
 
+    public function getUserNameOnly() {
+        return $this->select('users.id, users.nama')
+                    ->findAll();
+    }
+
     // protected function hashPassword(array $data)
     // {
     //     if (isset($data['data']['password'])) {
