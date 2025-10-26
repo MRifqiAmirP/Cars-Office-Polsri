@@ -45,7 +45,7 @@ class Service extends BaseController
                 $message = $kendaraanId
                     ? "Tidak ada data services untuk kendaraan $kendaraanId"
                     : "Tidak ada data services";
-                return responseError($message, 400);
+                return responseSuccess($message, 400);
             }
 
             $data = [];

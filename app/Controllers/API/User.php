@@ -24,7 +24,14 @@ class User extends BaseController
     public function index()
     {
         try {
-            // $data = $this->users->findAll();
+            $nameOnly = $this->request->getGet();
+
+            if($nameOnly) {
+                $data = $this->users->getUserNameOnly();
+
+                return responseSuccess('Data nama user', $data);
+            }
+            
             $data = $this->users->getUsersWithCars();
 
             if (empty($data)) {

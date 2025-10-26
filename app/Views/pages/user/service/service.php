@@ -165,7 +165,7 @@
             const data = res.data.data;
 
             if (!data.length) {
-                tbody.innerHTML = `<tr><td colspan="5" class="center">Belum ada data</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" class="center">Belum ada data</td></tr>`;
                 return;
             }
 
