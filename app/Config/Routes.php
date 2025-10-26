@@ -16,6 +16,8 @@ $routes->group('admin', ['filter' => ['auth', 'asAdmin', 'refreshSession']], fun
         $routes->get('user', 'Page::user');
         $routes->get('cars', 'Page::cars');
     });
+
+    $routes->get('mitra-bengkel', 'Page::bengkel');
 });
 
 // PAGE USER ROUTES
