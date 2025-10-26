@@ -24,9 +24,17 @@ class Cars extends BaseController
     {
         try {
             $result = $this->cars->getAllCarsWithUser();
+
+            $formattedResult = [];
+            foreach ($result as $car) {
+                $carArray = $car->toArray();
+                $carArray['foto_url'] = $car->getFotoUrl();
+                $formattedResult[] = $carArray;
+            }
+
             return responseSuccess(
                 'Data mobil',
-                $result
+                $formattedResult
             );
         } catch (\Throwable $th) {
             return responseInternalServerError($th->getMessage());
@@ -49,7 +57,10 @@ class Cars extends BaseController
                 return responseError('Data mobil dengan user ID' . $id . 'tidak ditemukan', 404);
             }
 
-            return responseSuccess('Berhasil. Data mobil by ID', $car);
+            $carData = $car->toArray();
+            $carData['foto_url'] = $car->getFotoUrl();
+
+            return responseSuccess('Berhasil. Data mobil by ID', $carData);
         } catch (\Throwable $th) {
             return responseInternalServerError($th->getMessage());
         }
@@ -145,7 +156,6 @@ class Cars extends BaseController
     {
         try {
             $input = $this->request->getPost();
-            $input['id'] = $id;
 
             if (!$input) {
                 return responseError('Tidak ada data yang diinput', 400, 'Empty input');
@@ -196,7 +206,11 @@ class Cars extends BaseController
                 $input['foto_kendaraan'] = $oldFoto;
             }
 
-            // $result = $this->cars->where('id', $id)->set($input)->update();
+            if ($input['delete_foto'] == 'true') {
+                $this->deleteFoto($id);
+                $input['foto_kendaraan'] = null;
+            }
+
             $result = $this->cars->update($id, $input);
 
             if (!$result) {
@@ -256,7 +270,7 @@ class Cars extends BaseController
         }
     }
 
-    public function deleteFoto($id = null)
+    private function deleteFoto($id = null)
     {
         try {
             $car = $this->cars->find($id);

@@ -102,7 +102,7 @@ class Cars extends Model
 
     public function getAllCarsWithUser()
     {
-        return $this->select('cars.*, users.nama as user_nama, users.nip as user_nip')
+        return $this->select('cars.*, users.nama as user_nama, users.jabatan')
                     ->join('users', 'users.id = cars.user_id')
                     ->findAll();
     }

@@ -55,7 +55,7 @@ class Cars extends Entity
         if ($this->foto_kendaraan) {
             return base_url('uploads/cars/' . $this->foto_kendaraan);
         }
-        return base_url('uploads/cars/default-car.jpg');
+        return null;
     }
 
     public function isDeleted()
