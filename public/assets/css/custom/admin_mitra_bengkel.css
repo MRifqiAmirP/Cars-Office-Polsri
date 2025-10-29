@@ -1,0 +1,64 @@
+.profile-info-row {
+    display: flex;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 8px;
+}
+.profile-info-name {
+    width: 140px;
+    font-weight: bold;
+    color: #666;
+    font-size: 12px;
+}
+.profile-info-value {
+    flex: 1;
+    font-size: 13px;
+}
+.document-preview {
+  margin-bottom: 15px;
+}
+.thumbnail {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 8px;
+    background: #f9f9f9;
+    transition: all 0.3s ease;
+}
+.thumbnail:hover {
+    border-color: #4f99c6;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+.doc-image {
+    border: 1px solid #ddd;
+    padding: 3px;
+    background: white;
+}
+.space-6 {
+    margin-top: 10px;
+}
+.panel {
+    margin-bottom: 15px;
+}
+.panel-heading {
+    padding: 8px 15px;
+}
+.panel-body {
+    padding: 15px;
+}
+.label-grey {
+    background-color: #a0a0a0;
+    color: white;
+}
+.no-margin {
+    margin-bottom: 0;
+}
+.widget-header-blue {
+    background: #4f99c6 !important;
+    border-color: #4f99c6 !important;
+}
+.widget-header-blue .widget-title {
+    color: white !important;
+}
+
+#map { height: 300px; }
+.leaflet-container { border-radius: 4px; }

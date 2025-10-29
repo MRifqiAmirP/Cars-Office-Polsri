@@ -44,7 +44,8 @@ class Page extends Controller
     public function bengkel() {
         $data = [
             'title' => 'Mitra Bengkel',
-            'role' => $this->getUserRole()
+            'role' => $this->getUserRole(),
+            'css' => 'admin_mitra_bengkel.css'
         ];
 
         return view('pages/admin/bengkel/mitra_bengkel', $data);
