@@ -41,6 +41,15 @@ class Page extends Controller
         return view('pages/admin/cars/cars', $data);
     }
 
+      public function request_service() {
+        $data = [
+            'title' => 'Request Service',
+            'role' => $this->getUserRole()
+        ];
+
+        return view('pages/admin/request_service', $data);
+    }
+
     protected function getUserRole() {
         return session()->get('role') ?? 'guest';
     }

@@ -87,6 +87,14 @@
 
             <b class="arrow"></b>
         </li>
+         <li class="">
+            <a href="<?= base_url('/admin/request-service'); ?>">
+                <i class="menu-icon fa fa-list-alt"></i>
+                <span class="menu-text">request-service </span>
+            </a>
+
+            <b class="arrow"></b>
+        </li>
 
         <li class="<?= uri_string() == 'calendar' ? 'active' : '' ?>">
             <a href="<?= base_url('/calendar') ?>">
