@@ -176,6 +176,8 @@
                     '<span class="label label-success">Selesai</span>' :
                     item.status === 'proses' ?
                     '<span class="label label-info">Proses</span>' :
+                    item.status === 'waiting' ? 
+                    '<span class="label label-primary">Waiting</span>' :
                     '<span class="label label-warning">Pending</span>';
 
                 const date = new Date(item.created_at.date).toLocaleString('id-ID', {
