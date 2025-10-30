@@ -79,7 +79,7 @@
             </ul>
         </li>
 
-        <li class="">
+        <li class="<?= uri_string() == 'admin/mitra-bengkel' ? 'active' : ''; ?>">
             <a href="<?= base_url('/admin/mitra-bengkel'); ?>">
                 <i class="menu-icon fa fa-list-alt"></i>
                 <span class="menu-text"> Mitra Bengkel </span>

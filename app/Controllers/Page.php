@@ -41,6 +41,16 @@ class Page extends Controller
         return view('pages/admin/cars/cars', $data);
     }
 
+    public function bengkel() {
+        $data = [
+            'title' => 'Mitra Bengkel',
+            'role' => $this->getUserRole(),
+            'css' => 'admin_mitra_bengkel.css'
+        ];
+
+        return view('pages/admin/bengkel/mitra_bengkel', $data);
+    }
+
     protected function getUserRole() {
         return session()->get('role') ?? 'guest';
     }

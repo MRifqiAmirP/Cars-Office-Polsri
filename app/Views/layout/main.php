@@ -58,7 +58,7 @@
     <![endif]-->
 </head>
 
-<body class="no-skin">
+<body class="no-skin" style="overflow-x: hidden;">
   <div class="main-container" id="main-container">
 
     <!-- Navbar -->

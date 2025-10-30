@@ -14,6 +14,7 @@
 		<li class="active">Kendaraan Dinas</li>
 	</ul>
 </div>
+
 <div class="container-fluid">
 	<h3 class="page-header" style="font-weight: bold;">Master Kendaraan Dinas</h3>
 
