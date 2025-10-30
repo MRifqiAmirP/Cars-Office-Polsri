@@ -18,7 +18,9 @@ class ServiceRequest extends Model
         'bengkel_id',
         'keluhan',
         'status',
+        'total_harga',
         'file',
+        'foto_nota',
         'created_at',
         'updated_at'
     ];
