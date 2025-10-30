@@ -43,6 +43,11 @@ class CreateServicesTable extends Migration
                 'constraint' => 11,
                 'null'       => true
             ],
+            'file' => [
+                'type' => 'VARCHAR',
+                'constraint' => 255,
+                'null' => true
+            ],
             'foto_nota' => [
                 'type' => 'VARCHAR',
                 'constraint' => 255,
