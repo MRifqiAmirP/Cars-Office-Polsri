@@ -21,7 +21,7 @@ class CreateTableServiceRequest extends Migration
                 'unsigned' => true,
             ],
             'kendaraan_id' => [
-                'type' => 'INT', 
+                'type' => 'INT',
                 'constraint' => 11,
                 'unsigned' => true,
             ],
@@ -39,7 +39,17 @@ class CreateTableServiceRequest extends Migration
                 'type' => 'ENUM("pending", "waiting", "proses", "selesai")',
                 'default' => 'pending',
             ],
+            'total_harga' => [
+                'type'       => 'INT',
+                'constraint' => 11,
+                'null'       => true
+            ],
             'file' => [
+                'type' => 'VARCHAR',
+                'constraint' => 255,
+                'null' => true,
+            ],
+            'foto_nota' => [
                 'type' => 'VARCHAR',
                 'constraint' => 255,
                 'null' => true,
