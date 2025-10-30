@@ -107,7 +107,9 @@ class ServiceRequest extends BaseController
             'bengkel_id'   => 'permit_empty|is_not_unique[mitra_bengkel.id]',
             'keluhan'      => 'required|string|min_length[5]',
             'status'       => 'permit_empty|string',
+            'total_harga'  => 'permit_empty',
             'file'         => 'permit_empty|uploaded[file]|max_size[file,1024]|ext_in[file,png,jpg,jpeg,pdf]',
+            'foto_nota'    => 'permit_empty |uploaded[file]|max_size[file,1024]ext_in[file,png,jpg,jpeg,pdf]'
         ];
 
         if (!$this->validate($validationRules)) {
@@ -119,7 +121,7 @@ class ServiceRequest extends BaseController
 
         if ($file && $file->isValid()) {
             $fileName = $file->getRandomName();
-            $file->move(FCPATH . 'uploads/service_request', $fileName);
+            $file->move(FCPATH . 'uploads/service_request/form', $fileName);
         }
 
         $data = [
@@ -172,15 +174,16 @@ class ServiceRequest extends BaseController
             'bengkel_id'   => $request->getPost('bengkel_id') ?: $oldData->bengkel_id,
             'keluhan'      => $request->getPost('keluhan') ?: $oldData->keluhan,
             'status'       => $request->getPost('status') ?: $oldData->status,
+            'total_harga'  => $request->getPost('total_harga') ?: $oldData->total_harga
         ];
 
         $file = $request->getFile('file');
         if ($file && $file->isValid() && !$file->hasMoved()) {
-            if (!empty($oldData->file) && file_exists(FCPATH . 'uploads/service_requests/' . $oldData->file)) {
-                unlink(FCPATH . 'uploads/service_requests/' . $oldData->file);
+            if (!empty($oldData->file) && file_exists(FCPATH . 'uploads/service_requests/file/' . $oldData->file)) {
+                unlink(FCPATH . 'uploads/service_requests/file/' . $oldData->file);
             }
 
-            $uploadPath = FCPATH . 'uploads/service_requests/';
+            $uploadPath = FCPATH . 'uploads/service_requests/file/';
             if (!is_dir($uploadPath)) {
                 mkdir($uploadPath, 0777, true);
             }
@@ -188,6 +191,19 @@ class ServiceRequest extends BaseController
             $newName = $file->getRandomName();
             $file->move($uploadPath, $newName);
             $data['file'] = $newName;
+        }
+
+        $nota = $this->request->getFile('foto_nota');
+        $fileNota = null;
+
+        if ($nota && $nota->isValid()) {
+            if (!empty($oldData->foto_nota) && file_exists(FCPATH . 'uploads/service_requests/nota/' . $oldData->foto_nota)) {
+                unlink(FCPATH . 'uploads/service_requests/nota/' . $oldData->foto_nota);
+            }
+
+            $fileNota = $nota->getRandomName();
+            $nota->move(FCPATH . 'uploads/service_requests/nota/', $fileNota);
+            $data['foto_nota'] = $fileNota;
         }
 
         $this->service_request->update($id, $data);
