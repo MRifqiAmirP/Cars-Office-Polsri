@@ -334,67 +334,6 @@
 	}
 </script>
 
-<script>
-	async function update(id) {
-		const url = `/api/cars/update/${id}`
-		const formData = new FormData(document.getElementById('formCars'))
-
-		formData.set('delete_foto', formData.get('delete_foto') == 'on' ? true : false);
-
-		const data = {
-			csrf_cookie: formData.get('csrf')
-		}
-		formData.delete('csrf')
-
-		const fileStatus = fileHandler.getFileStatus();
-
-		try {
-			const response = await fetch(url, {
-				method: 'POST',
-				headers: {
-					'X-CSRF-TOKEN': data.csrf_cookie
-				},
-				body: formData
-			})
-
-			const result = await response.json()
-
-			if (result.status === 'success') {
-				Swal.fire({
-					icon: 'success',
-					title: 'Berhasil!',
-					text: 'User berhasil diupdate',
-					confirmButtonColor: '#28a745',
-					showCancelButton: false,
-					confirmButtonText: 'OK'
-				}).then((result) => {
-					if (result.isConfirmed) {
-						location.reload()
-					}
-				})
-			} else {
-				Swal.fire({
-					icon: 'error',
-					title: 'Gagal update User',
-					text: result.message || 'Unknown error',
-					confirmButtonColor: '#d33'
-				})
-			}
-		} catch (error) {
-			console.error('Error: ', error)
-			Swal.fire({
-				toast: true,
-				icon: 'error',
-				title: 'Gagal update User',
-				text: error.message,
-				position: 'bottom-end',
-				showConfirmButton: false,
-				timer: 5000,
-				timerProgressBar: true
-			})
-		}
-	}
-</script>
 
 <script>
 	class FileUploadHandler {

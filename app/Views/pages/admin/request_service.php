@@ -12,7 +12,6 @@
 </div>
 <div class="container-fluid">
 	<h3 class="page-header" style="font-weight: bold;">Request Service</h3>
-
 	<div class="table-responsive" style="margin-top:20px;">
 		<table class="table table-bordered table-hover">
 			<thead>
@@ -33,7 +32,64 @@
 		</table>
 	</div>
 </div>
+
+<!-- form -->
+
+<div class="modal fade" id="modalTambahKendaraan" tabindex="-1" role="dialog" aria-labelledby="modalTambahKendaraanLabel">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<form id="formCars">
+					<input type="hidden" name="csrf" value="<?= csrf_hash(); ?>">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span>&times;</span>
+						</button>
+						<h4 class="modal-title" id="modalTambahKendaraanLabel">Tambah Kendaraan</h4>
+					</div>
+
+					<div class="modal-body">
+						<div class="form-group">
+							<label for="keterangan">Keterangan</label>
+							<input type="text" id="keterangan" class="form-control" name="keterangan" placeholder="Masukkan keterangan">
+						</div>
+
+						<div class="form-group">
+							<label for="fileUpload" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Unggah Foto Kendaraan</label>
+
+							<div class="drop-zone" id="dropZone"
+								style="border: 2px dashed #ccc; border-radius: 8px; padding: 2rem; text-align: center; transition: all 0.3s ease; background: #f8f9fa; cursor: pointer;">
+
+								<div class="drop-zone-content">
+									<div style="font-size: 3rem; color: #6c757d; margin-bottom: 1rem;">📁</div>
+									<span style="display: block; font-size: 1.1rem; color: #495057; margin-bottom: 0.5rem;">Drag & drop foto di sini</span>
+									<span style="display: block; color: #6c757d; margin-bottom: 0.5rem;">atau</span>
+									<button type="button" style="background: #007bff; color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer;">Pilih File</button>
+									<input type="file" class="drop-zone-input" id="fileUpload" name="foto_kendaraan" hidden style="opacity: 0;">
+								</div>
+							</div>
+
+							<div class="file-info" id="fileInfo" style="margin-top: 1rem; padding: 0.75rem; background: #e8f5e8; border-radius: 4px; display: none;"></div>
+						</div>
+
+						<input type="checkbox" id="delete_foto" name="delete_foto" hidden>
+					</div>
+
+					<div class="modal-footer">
+						<button id="saveButton" type="submit" class="btn btn-success">>
+							<i class="glyphicon glyphicon-floppy-disk"></i> Simpan
+						</button>
+						<button type="button" class="btn btn-default" data-dismiss="modal">
+							<i class="glyphicon glyphicon-remove"></i> Batal
+						</button>
+					</div>
+				</form>
+
+			</div>
+		</div>
+	</div>
 <?= $this->endSection(); ?>
+
+
 
 <?= $this->section('scripts'); ?>
 <script type="text/javascript">
@@ -78,12 +134,26 @@ document.addEventListener('DOMContentLoaded', async function() {
 		const resultBengkel = await resBengkel.json();
 		const bengkelList = resultBengkel.data?.bengkel || [];
 
+		// Jika data kosong
+		if (reqService.length === 0) {
+			tableBody.innerHTML = `
+				<tr>
+					<td colspan="8" class="text-center text-muted py-3">
+						<i>Tidak ada data service request</i>
+					</td>
+				</tr>`;
+			return;
+		}
+
 		tableBody.innerHTML = reqService.map((data, index) => {
 			const options = bengkelList.map(b => `
 				<option value="${b.id}" ${data.bengkel_id == b.id ? 'selected' : ''}>
 					${b.nama_bengkel}
 				</option>
 			`).join('');
+
+			// Tombol input harga & nota — disable jika status != selesai
+			const disabled = data.status !== 'selesai' ? 'disabled' : '';
 
 			return `
 				<tr>
@@ -92,25 +162,29 @@ document.addEventListener('DOMContentLoaded', async function() {
 					<td>${data.merk || '-'}</td>
 					<td>${data.type || '-'}</td>
 					<td>${data.plat_kendaran || '-'}</td>
-					<td><select class="form-select status" data-id="${data.id}">
-							<option value="pending"  ${data.status == 'pending' ? 'selected' : ''}>Pending</option>
-							<option value="waiting"  ${data.status == 'waiting' ? 'selected' : ''}>Waiting</option>
-							<option value="proses" ${data.status == 'proses' ? 'selected' : ''} >Proses</option>
-							<option value="selesai"${data.status == 'selesai' ? 'selected' : ''} >Selesai</option>
-						</select></td>
+					<td>
+						<select class="form-select status" data-id="${data.id}">
+							<option value="pending" ${data.status == 'pending' ? 'selected' : ''}>Pending</option>
+							<option value="waiting" ${data.status == 'waiting' ? 'selected' : ''}>Waiting</option>
+							<option value="proses" ${data.status == 'proses' ? 'selected' : ''}>Proses</option>
+							<option value="selesai" ${data.status == 'selesai' ? 'selected' : ''}>Selesai</option>
+						</select>
+					</td>
 					<td>
 						<select class="form-select pilih-bengkel" data-id="${data.id}">
 							<option value="">-- Pilih Bengkel --</option>
 							${options}
 						</select>
 					</td>
-					<td>
-						<button class="btn btn-primary btn-input" data-id="${data.id}">Input</button>
+					<td class="text-center">
+						<button class="btn btn-success btn-input" data-id="${data.id}">Update</button>
+						<button class="btn btn-primary btn-harga-nota" data-id="${data.id}" ${disabled} data-toggle="modal" data-target="#modalTambahKendaraan">Input Harga & Nota</button>
 					</td>
 				</tr>
 			`;
 		}).join('');
 
+		// Event: update bengkel & status
 		document.querySelectorAll('.btn-input').forEach(btn => {
 			btn.addEventListener('click', async function() {
 				const id = this.dataset.id;
@@ -127,7 +201,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 					const csrfToken = '<?= csrf_hash() ?>';
 					const response = await fetch(`/api/service_request/update/${id}`, {
 						method: 'POST',
-						 headers: { 'X-CSRF-TOKEN': csrfToken },
+						headers: { 'X-CSRF-TOKEN': csrfToken },
 						body: formData
 					});
 
@@ -135,48 +209,43 @@ document.addEventListener('DOMContentLoaded', async function() {
 					console.log('Response dari server:', result);
 
 					if (result.status === 'success') {
-					Swal.fire({
-					icon: 'success',
-					title: 'Berhasil!',
-					text: 'bengkel dan status berhasil diupdate',
-					confirmButtonColor: '#28a745',
-					showCancelButton: false,
-					confirmButtonText: 'OK'
-				}).then((result) => {
-					if (result.isConfirmed) {
-						location.reload()
-					}
-				})
+						Swal.fire({
+							icon: 'success',
+							title: 'Berhasil!',
+							text: 'Bengkel dan status berhasil diupdate.',
+							confirmButtonColor: '#28a745',
+						}).then(() => location.reload());
 					} else {
 						Swal.fire({
-					icon: 'error',
-					title: 'Gagal update bengkel',
-					text: result.message || 'Unknown error',
-					confirmButtonColor: '#d33'
-				})
+							icon: 'error',
+							title: 'Gagal update bengkel',
+							text: result.message || 'Unknown error',
+							confirmButtonColor: '#d33'
+						});
 					}
-				} catch (err) {
-				console.error('Error: ', error)
+				} catch (error) {
+					console.error('Error: ', error);
 					Swal.fire({
-					toast: true,
-					icon: 'error',
-					title: 'Gagal Menambahkan update bengkel',
-					text: error.message,
-					position: 'bottom-end',
-					showConfirmButton: false,
-					timer: 5000,
-					timerProgressBar: true
-			})
+						toast: true,
+						icon: 'error',
+						title: 'Gagal Menambahkan update bengkel',
+						text: error.message,
+						position: 'bottom-end',
+						showConfirmButton: false,
+						timer: 5000,
+						timerProgressBar: true
+					});
 				}
 			});
 		});
+
+
 	} catch (error) {
 		console.error('Gagal memuat data:', error);
-		tableBody.innerHTML = `<tr><td colspan="7">Gagal memuat data</td></tr>`;
+		tableBody.innerHTML = `<tr><td colspan="8" class="text-center text-danger">Gagal memuat data</td></tr>`;
 	}
 });
 </script>
-
 
 
 
@@ -860,4 +929,5 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 	const fileHandler = new FileUploadHandler('dropZone', 'fileUpload', 'fileInfo');
 </script>
+
 <?= $this->endSection(); ?>
