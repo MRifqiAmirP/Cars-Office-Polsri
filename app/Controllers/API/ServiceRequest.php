@@ -109,7 +109,7 @@ class ServiceRequest extends BaseController
             'status'       => 'permit_empty|string',
             'total_harga'  => 'permit_empty',
             'file'         => 'permit_empty|uploaded[file]|max_size[file,1024]|ext_in[file,png,jpg,jpeg,pdf]',
-            'foto_nota'    => 'permit_empty |uploaded[file]|max_size[file,1024]ext_in[file,png,jpg,jpeg,pdf]'
+            'foto_nota'    => 'permit_empty|uploaded[file]|max_size[file,1024]ext_in[file,png,jpg,jpeg,pdf]'
         ];
 
         if (!$this->validate($validationRules)) {
