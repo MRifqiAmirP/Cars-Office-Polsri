@@ -19,6 +19,7 @@ class Services extends Model
         'speedometer_yang_lalu',
         'speedometer_saat_ini',
         'total_harga',
+        'file',
         'foto_nota',
         'created_at',
         'updated_at'
@@ -33,14 +34,12 @@ class Services extends Model
     ];
     protected array $castHandlers = [];
 
-    // Dates
     protected $useTimestamps = true;
     protected $dateFormat    = 'datetime';
     protected $createdField  = 'created_at';
     protected $updatedField  = 'updated_at';
     protected $deletedField  = 'deleted_at';
 
-    // Validation
     protected $validationRules = [
         'kendaraan_id' => 'required|integer|is_not_unique[cars.id]',
         'bengkel_id' => 'permit_empty|integer|is_not_unique[mitra_bengkel.id]',
