@@ -1,10 +1,10 @@
-<?php $this->extend('layout/main'); ?>
+<?= $this->extend('layout/main'); ?>
 
-<?php $this->section('content'); ?>
+<?= $this->section('content'); ?>
 <div class="page-content">
-    <div class="pull-right" style="margin-top:5px; margin-bottom: 10px;">
+    <div class="pull-right" style="margin-top:5px; margin-bottom: 15px;">
         <button class="btn btn-primary btn-sm" id="btnBuatRequest">
-            <i class="ace-icon fa fa-plus-circle bigger-120"></i> Buat Pengajuan Servis
+            <i class="fa fa-plus-circle bigger-120"></i> Buat Pengajuan Servis
         </button>
     </div>
 
@@ -16,60 +16,68 @@
                 <div class="widget-header">
                     <h5 class="widget-title"><i class="fa fa-wrench"></i> Data Request Servis</h5>
                     <div class="widget-toolbar">
-                        <a href="#" data-action="collapse"><i class="ace-icon fa fa-chevron-up"></i></a>
+                        <a href="#" data-action="collapse">
+                            <i class="ace-icon fa fa-chevron-up"></i>
+                        </a>
                     </div>
                 </div>
 
                 <div class="widget-body">
                     <div class="widget-main no-padding">
-                        <table id="tableRequest" class="table table-striped table-bordered table-hover">
-                            <thead>
-                                <tr>
-                                    <th>No</th>
-                                    <th>Kendaraan</th>
-                                    <th>Bengkel</th>
-                                    <th>Keluhan</th>
-                                    <th>Status</th>
-                                    <th>Tanggal Request</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tbodyRequest">
-                                <tr>
-                                    <td colspan="8" class="center">Memuat data...</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                        <div class="table-responsive">
+                            <table id="tableRequest" class="table table-striped table-bordered table-hover">
+                                <thead>
+                                    <tr>
+                                        <th class="center">No</th>
+                                        <th class="center">Kendaraan</th>
+                                        <th class="center">Bengkel</th>
+                                        <th class="center">Keluhan</th>
+                                        <th class="center">Status</th>
+                                        <th class="center">Tanggal Request</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbodyRequest">
+                                    <tr>
+                                        <td colspan="6" class="center loading-row">Memuat data...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <!-- SERVIS SELESAI -->
-            <div class="widget-box" style="margin-top: 5rem;">
+            <div class="widget-box mt-5">
                 <div class="widget-header">
                     <h5 class="widget-title"><i class="fa fa-check-square"></i> Data Servis Kendaraan</h5>
                     <div class="widget-toolbar">
-                        <a href="#" data-action="collapse"><i class="ace-icon fa fa-chevron-up"></i></a>
+                        <a href="#" data-action="collapse">
+                            <i class="ace-icon fa fa-chevron-up"></i>
+                        </a>
                     </div>
                 </div>
 
                 <div class="widget-body">
                     <div class="widget-main no-padding">
-                        <table id="tableService" class="table table-striped table-bordered table-hover">
-                            <thead>
-                                <tr>
-                                    <th>No</th>
-                                    <th>Tanggal</th>
-                                    <th>Bengkel</th>
-                                    <th>Speedometer Sekarang</th>
-                                    <th>Jenis Perawatan</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tbodyService">
-                                <tr>
-                                    <td colspan="5" class="center">Memuat data...</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                        <div class="table-responsive">
+                            <table id="tableService" class="table table-striped table-bordered table-hover">
+                                <thead>
+                                    <tr>
+                                        <th class="center">No</th>
+                                        <th class="center">Tanggal</th>
+                                        <th class="center">Bengkel</th>
+                                        <th class="center">Speedometer Sekarang</th>
+                                        <th class="center">Jenis Perawatan</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbodyService">
+                                    <tr>
+                                        <td colspan="5" class="center loading-row">Memuat data...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -105,24 +113,24 @@
                     <div class="form-group">
                         <label class="col-sm-3 control-label no-padding-right">Keluhan</label>
                         <div class="col-sm-9">
-                            <textarea id="keluhan" name="keluhan" class="form-control" placeholder="Masukkan keluhan kendaraan..." required></textarea>
+                            <textarea id="keluhan" name="keluhan" class="form-control" placeholder="Masukkan keluhan kendaraan..." required rows="5"></textarea>
                         </div>
                     </div>
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default pull-left" data-dismiss="modal">
-                        <i class="ace-icon fa fa-times"></i> Batal
+                    <button type="button" class="btn btn-default" data-dismiss="modal">
+                        <i class="fa fa-times"></i> Batal
                     </button>
                     <button type="submit" class="btn btn-primary">
-                        <i class="ace-icon fa fa-check"></i> Kirim Request
+                        <i class="fa fa-check"></i> Kirim Request
                     </button>
                 </div>
             </form>
         </div>
     </div>
 </div>
-<?php $this->endSection(); ?>
+<?= $this->endSection(); ?>
 
 <?= $this->section('scripts') ?>
 <script>
@@ -165,7 +173,9 @@
             const data = res.data.data;
 
             if (!data.length) {
-                tbody.innerHTML = `<tr><td colspan="6" class="center">Belum ada data</td></tr>`;
+                tbody.innerHTML = `<tr>
+    <td colspan="6" class="center">Belum ada data</td>
+</tr>`;
                 return;
             }
 
@@ -176,7 +186,7 @@
                     '<span class="label label-success">Selesai</span>' :
                     item.status === 'proses' ?
                     '<span class="label label-info">Proses</span>' :
-                    item.status === 'waiting' ? 
+                    item.status === 'waiting' ?
                     '<span class="label label-primary">Waiting</span>' :
                     '<span class="label label-warning">Pending</span>';
 
@@ -186,19 +196,21 @@
                 });
 
                 tbody.innerHTML += `
-          <tr>
-            <td>${i + 1}</td>
-            <td>${item.merk} ${item.type} (${item.plat_kendaran})</td>
-            <td>${item.nama_bengkel ?? '-'}</td>
-            <td>${item.keluhan}</td>
-            <td>${statusLabel}</td>
-            <td>${date}</td>
-          </tr>
-        `;
+<tr>
+    <td>${i + 1}</td>
+    <td>${item.merk} ${item.type} (${item.plat_kendaran})</td>
+    <td>${item.nama_bengkel ?? '-'}</td>
+    <td>${item.keluhan}</td>
+    <td>${statusLabel}</td>
+    <td>${date}</td>
+</tr>
+`;
             });
         } catch (err) {
             console.error(err);
-            tbody.innerHTML = `<tr><td colspan="5" class="center text-danger">Gagal memuat data</td></tr>`;
+            tbody.innerHTML = `<tr>
+    <td colspan="5" class="center text-danger">Gagal memuat data</td>
+</tr>`;
         }
     }
 
@@ -213,7 +225,9 @@
             tbody.innerHTML = '';
 
             if (!data.length) {
-                tbody.innerHTML = `<tr><td colspan="5" class="center">Belum ada data servis</td></tr>`;
+                tbody.innerHTML = `<tr>
+    <td colspan="5" class="center">Belum ada data servis</td>
+</tr>`;
                 return;
             }
 
@@ -223,18 +237,20 @@
                 const namaBengkel = item.nama_bengkel || '-';
 
                 tbody.innerHTML += `
-                <tr>
-                    <td>${i + 1}</td>
-                    <td>${tanggal}</td>
-                    <td>${namaBengkel}</td>
-                    <td>${item.speedometer_saat_ini} Km</td>
-                    <td>${perawatan}</td>
-                </tr>
-            `;
+<tr>
+    <td>${i + 1}</td>
+    <td>${tanggal}</td>
+    <td>${namaBengkel}</td>
+    <td>${item.speedometer_saat_ini} Km</td>
+    <td>${perawatan}</td>
+</tr>
+`;
             });
         } catch (err) {
             console.error('Error loading service data:', err);
-            tbody.innerHTML = `<tr><td colspan="5" class="center text-danger">Gagal memuat data servis</td></tr>`;
+            tbody.innerHTML = `<tr>
+    <td colspan="5" class="center text-danger">Gagal memuat data servis</td>
+</tr>`;
         }
     }
 
