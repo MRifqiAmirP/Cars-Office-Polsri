@@ -23,7 +23,7 @@
 					<th>Plat Kendaraan</th>
 					<th>Status</th>
 					<th>Bengkel</th>
-					<th>Input</th>
+					<th>aksi</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -50,7 +50,7 @@
 					<div class="modal-body">
 						<div class="form-group">
 							<label for="keterangan">Keterangan</label>
-							<input type="text" id="keterangan" class="form-control" name="keterangan" placeholder="Masukkan keterangan">
+							<input type="varchar" id="keterangan" class="form-control" name="total harga" placeholder="Masukkan keterangan">
 						</div>
 
 						<div class="form-group">
@@ -64,7 +64,7 @@
 									<span style="display: block; font-size: 1.1rem; color: #495057; margin-bottom: 0.5rem;">Drag & drop foto di sini</span>
 									<span style="display: block; color: #6c757d; margin-bottom: 0.5rem;">atau</span>
 									<button type="button" style="background: #007bff; color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer;">Pilih File</button>
-									<input type="file" class="drop-zone-input" id="fileUpload" name="foto_kendaraan" hidden style="opacity: 0;">
+									<input type="file" class="drop-zone-input" id="fileUpload" name="foto_nota" hidden style="opacity: 0;">
 								</div>
 							</div>
 
@@ -164,10 +164,10 @@ document.addEventListener('DOMContentLoaded', async function() {
 					<td>${data.plat_kendaran || '-'}</td>
 					<td>
 						<select class="form-select status" data-id="${data.id}">
-							<option value="pending" ${data.status == 'pending' ? 'selected' : ''}>Pending</option>
-							<option value="waiting" ${data.status == 'waiting' ? 'selected' : ''}>Waiting</option>
-							<option value="proses" ${data.status == 'proses' ? 'selected' : ''}>Proses</option>
-							<option value="selesai" ${data.status == 'selesai' ? 'selected' : ''}>Selesai</option>
+							<option class="label label-warning" value="pending" ${data.status == 'pending' ? 'selected' : ''}>Pending</option>
+							<option class="label label-primary" value="waiting" ${data.status == 'waiting' ? 'selected' : ''}>Waiting</option>
+							<option class="label label-info" value="proses" ${data.status == 'proses' ? 'selected' : ''}>Proses</option>
+							<option class="label label-succes" value="selesai" ${data.status == 'selesai' ? 'selected' : ''}>Selesai</option>
 						</select>
 					</td>
 					<td>
@@ -178,13 +178,39 @@ document.addEventListener('DOMContentLoaded', async function() {
 					</td>
 					<td class="text-center">
 						<button class="btn btn-success btn-input" data-id="${data.id}">Update</button>
-						<button class="btn btn-primary btn-harga-nota" data-id="${data.id}" ${disabled} data-toggle="modal" data-target="#modalTambahKendaraan">Input Harga & Nota</button>
-					</td>
+						<button class="btn btn-primary btn-harga-nota" onClick="edit(${data.id})" ${disabled}>Input Harga & Nota</button>
+						<button class="btn btn-primary btn-harga-nota" onClick="edit(${data.id})" ${disabled}>PDF</button>
 				</tr>
 			`;
 		}).join('');
+// status kondisi
+document.querySelectorAll('.status').forEach(select => {
+  const updateClass = (el) => {
 
-		// Event: update bengkel & status
+    el.classList.remove('label-warning', 'label-primary', 'label-info', 'label-success', 'text-white');
+
+    switch (el.value) {
+      case 'pending':
+        el.classList.add('label-warning', 'text-white');
+        break;
+      case 'waiting':
+        el.classList.add('label-primary', 'text-white');
+        break;
+      case 'proses':
+        el.classList.add('label-info', 'text-white');
+        break;
+      case 'selesai':
+        el.classList.add('label-success', 'text-white');
+        break;
+    }
+  };
+  updateClass(select);
+
+  select.addEventListener('change', function() {
+    updateClass(this);
+  });
+});
+
 		document.querySelectorAll('.btn-input').forEach(btn => {
 			btn.addEventListener('click', async function() {
 				const id = this.dataset.id;
@@ -247,7 +273,97 @@ document.addEventListener('DOMContentLoaded', async function() {
 });
 </script>
 
+<script>
+	async function edit(id) {
+		const url = `/api/service_request/${id}`;
+		document.getElementById('modalTambahKendaraanLabel').innerHTML = 'Edit Kendaraan';
 
+		try {
+			const result = await fetch(url);
+			const response = await result.json();
+			const data = response.data;
+
+			if (data && typeof data === 'object') {
+				document.getElementById('saveButton').setAttribute('onclick', `update(${id})`)
+				document.getElementById('saveButton').setAttribute('type', 'button')
+
+				document.getElementById('keterangan').value = data.total_harga || '';
+				if(data.foto_nota) {
+					fileHandler.setExistingFile(data.foto_nota, data.fota_nota);
+				}
+
+				$('#modalTambahKendaraan').modal('show');
+			} else {
+				console.error('Invalid response format:', response);
+				alert('Gagal memuat data user');
+			}
+
+		} catch (error) {
+			console.error('Gagal memuat data:', error);
+			alert('Terjadi kesalahan saat memuat data');
+		}
+	}
+</script>
+
+<script>
+	async function update(id) {
+		const url = `/api/service_request/update/${id}`
+		const formData = new FormData(document.getElementById('formCars'))
+
+		const data = {
+			csrf_cookie: formData.get('csrf')
+		}
+
+
+		try {
+			const response = await fetch(url, {
+				method: 'POST',
+				headers: {
+					'X-CSRF-TOKEN': data.csrf_cookie
+				},
+				body: formData
+			})
+
+			
+
+			const result = await response.json()
+
+			if (result.status === 'success') {
+				Swal.fire({
+					icon: 'success',
+					title: 'Berhasil!',
+					text: 'User berhasil diupdate',
+					confirmButtonColor: '#28a745',
+					showCancelButton: false,
+					confirmButtonText: 'OK'
+				}).then((result) => {
+					if (result.isConfirmed) {
+						location.reload()
+					}
+				})
+			} else {
+				Swal.fire({
+					icon: 'error',
+					title: 'Gagal update User',
+					text: result.message || 'Unknown error',
+					confirmButtonColor: '#d33'
+				})
+			}
+		} catch (error) {
+			console.error('Error: ', error)
+			Swal.fire({
+				toast: true,
+				icon: 'error',
+				title: 'Gagal update User',
+				text: error.message,
+				position: 'bottom-end',
+				showConfirmButton: false,
+				timer: 5000,
+				timerProgressBar: true
+			})
+		}
+	}
+</script>
 
 <script>
 	class FileUploadHandler {
