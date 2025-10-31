@@ -87,6 +87,60 @@
 			</div>
 		</div>
 	</div>
+
+	<!-- MODAL DETAIL -->
+<div class="modal fade" id="modalDetail" tabindex="-1" aria-labelledby="modalDetailLabel" aria-hidden="true">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header bg-primary text-white">
+				<h5 class="modal-title" id="modalDetailLabel">Detail Service Request</h5>
+				<button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+					<span>&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<table class="table table-bordered">
+					<tr>
+						<th>User</th>
+						<td id="detail_user"></td>
+					</tr>
+					<tr>
+						<th>Kendaraan</th>
+						<td id="detail_kendaraan"></td>
+					</tr>
+					<tr>
+						<th>Bengkel</th>
+						<td id="detail_bengkel"></td>
+					</tr>
+					<tr>
+						<th>Keluhan</th>
+						<td id="detail_keluhan"></td>
+					</tr>
+					<tr>
+						<th>Status</th>
+						<td id="detail_status"></td>
+					</tr>
+					<tr>
+						<th>Total Harga</th>
+						<td id="detail_total"></td>
+					</tr>
+					<tr>
+						<th>File</th>
+						<td id="detail_file"></td>
+					</tr>
+					<tr>
+						<th>Foto Nota</th>
+						<td id="detail_foto_nota"></td>
+					</tr>
+				</table>
+			</div>
+			<div class="modal-footer">
+				<button class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+			</div>
+		</div>
+	</div>
+</div>
+
 <?= $this->endSection(); ?>
 
 
@@ -152,7 +206,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 				</option>
 			`).join('');
 
-			// Tombol input harga & nota — disable jika status != selesai
+			// Tombol input harga & nota 
 			const disabled = data.status !== 'selesai' ? 'disabled' : '';
 
 			return `
@@ -179,6 +233,9 @@ document.addEventListener('DOMContentLoaded', async function() {
 					<td class="text-center">
 						<button class="btn btn-success btn-input" data-id="${data.id}">Update</button>
 						<button class="btn btn-primary btn-harga-nota" onClick="edit(${data.id})" ${disabled}>Input Harga & Nota</button>
+						<button class="btn btn-info btn-sm" onclick="showDetail(${data.id})">
+							<i class="fa fa-eye"></i> Detail
+						</button>
 						<button class="btn btn-primary btn-harga-nota" onClick="edit(${data.id})" ${disabled}>PDF</button>
 				</tr>
 			`;
@@ -361,6 +418,43 @@ document.querySelectorAll('.status').forEach(select => {
 				timer: 5000,
 				timerProgressBar: true
 			})
+		}
+	}
+</script>
+<script>
+	async function showDetail(id) {
+		try {
+			const response = await fetch(`/api/service_request/${id}`);
+			const result = await response.json();
+
+			if (result.status === 'success' && result.data.length > 0) {
+				const d = result.data[0];
+
+				document.getElementById('detail_user').textContent = `${d.user_nama} (${d.user_email})`;
+				document.getElementById('detail_kendaraan').textContent = `${d.merk} ${d.type} - ${d.plat_kendaran}`;
+				document.getElementById('detail_bengkel').textContent = d.nama_bengkel ?? '-';
+				document.getElementById('detail_keluhan').textContent = d.keluhan ?? '-';
+				document.getElementById('detail_status').textContent = d.status ?? '-';
+				document.getElementById('detail_total').textContent = d.total_harga ?? '-';
+
+				// tampilkan file (jika ada)
+				const fileCell = document.getElementById('detail_file');
+				fileCell.innerHTML = d.file
+					? `<a href="/uploads/service_requests/file/${d.file}" target="_blank">Lihat File</a>`
+					: '-';
+
+				const notaCell = document.getElementById('detail_foto_nota');
+				notaCell.innerHTML = d.foto_nota
+					? `<img src="/uploads/service_requests/nota/${d.foto_nota}" alt="Nota" class="img-fluid" style="max-height:200px;">`
+					: '-';
+
+				$('#modalDetail').modal('show');
+			} else {
+				Swal.fire('Gagal', 'Data tidak ditemukan', 'error');
+			}
+		} catch (err) {
+			console.error(err);
+			Swal.fire('Error', 'Gagal mengambil data detail', 'error');
 		}
 	}
 </script>
