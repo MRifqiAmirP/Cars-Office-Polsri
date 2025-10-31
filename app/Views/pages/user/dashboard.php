@@ -6,47 +6,52 @@
         <!-- Ringkasan Kendaraan -->
         <div class="widget-box">
             <div class="widget-header">
-                <h4 class="widget-title">Ringkasan Kendaraan</h4>
+                <h4 class="widget-title">
+                    <i class="fa fa-car"></i> Ringkasan Kendaraan
+                </h4>
             </div>
             <div class="widget-body">
                 <div class="widget-main row">
                     <div class="col-md-4">
-                        <img id="foto-kendaraan" src="assets/images/loading.gif" alt="Kendaraan" class="img-responsive" />
+                        <div id="loading-contrainer" class="loading-container">
+                            <div class="loading-spinner"></div>
+                        </div>
+                        <img id="foto-kendaraan" src="https://via.placeholder.com/300x200?text=Toyota+Avanza" alt="Kendaraan" class="img-responsive" style="display: none;" />
                     </div>
                     <div class="col-md-8">
                         <table class="table">
                             <tbody>
                                 <tr>
                                     <th>Merk</th>
-                                    <td id="merk"></td>
+                                    <td id="merk">Toyota</td>
                                 </tr>
                                 <tr>
                                     <th>Type</th>
-                                    <td id="type"></td>
+                                    <td id="type">Avanza 1.5 G</td>
                                 </tr>
                                 <tr>
                                     <th>Nomor Polisi</th>
-                                    <td id="no-polisi"></td>
+                                    <td id="no-polisi">B 1234 ABC</td>
                                 </tr>
                                 <tr>
                                     <th>Tahun</th>
-                                    <td id="tahun"></td>
+                                    <td id="tahun">2020</td>
                                 </tr>
                                 <tr>
                                     <th>Pemegang</th>
-                                    <td id="pemegang"></td>
+                                    <td id="pemegang">Budi Santoso</td>
                                 </tr>
                                 <tr>
                                     <th>KM Servis Terakhir</th>
-                                    <td id="km-terakhir"></td>
+                                    <td id="km-terakhir">45.200 km</td>
                                 </tr>
                                 <tr>
                                     <th>Terakhir Servis</th>
-                                    <td id="terakhir-servis"></td>
+                                    <td id="terakhir-servis">15 Januari 2023</td>
                                 </tr>
                                 <tr>
                                     <th>Keterangan</th>
-                                    <td id="catatan">-</td>
+                                    <td id="catatan">Ban depan perlu diganti dalam 2 bulan ke depan</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -60,9 +65,13 @@
             <div class="col-md-6">
                 <div class="widget-box">
                     <div class="widget-header">
-                        <h4 class="widget-title">Pengajuan Servis</h4>
+                        <h4 class="widget-title">
+                            <i class="fa fa-wrench"></i> Pengajuan Servis
+                        </h4>
                         <span class="widget-toolbar">
-                            <a href="#" id="link-lihat-semua-perbaikan">Lihat Semua</a>
+                            <a href="#" id="link-lihat-semua-perbaikan">
+                                <i class="fa fa-list"></i> Lihat Semua
+                            </a>
                         </span>
                     </div>
                     <div class="widget-body">
@@ -76,7 +85,35 @@
                                         <th>Aksi</th>
                                     </tr>
                                 </thead>
-                                <tbody id="tabel-perbaikan"></tbody>
+                                <tbody id="tabel-perbaikan">
+                                    <tr>
+                                        <td>Bengkel Sejahtera</td>
+                                        <td>Mesin berisik saat idle</td>
+                                        <td><span class="status-badge status-pending">Menunggu</span></td>
+                                        <td>
+                                            <button class="btn btn-action btn-detail">Detail</button>
+                                            <button class="btn btn-action btn-edit">Edit</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Auto Care Center</td>
+                                        <td>Ganti oli dan filter</td>
+                                        <td><span class="status-badge status-approved">Disetujui</span></td>
+                                        <td>
+                                            <button class="btn btn-action btn-detail">Detail</button>
+                                            <button class="btn btn-action btn-edit">Edit</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Speed Tune</td>
+                                        <td>Rem kurang pakem</td>
+                                        <td><span class="status-badge status-in-progress">Diproses</span></td>
+                                        <td>
+                                            <button class="btn btn-action btn-detail">Detail</button>
+                                            <button class="btn btn-action btn-edit">Edit</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
                             </table>
                         </div>
                     </div>
@@ -87,9 +124,13 @@
             <div class="col-md-6">
                 <div class="widget-box">
                     <div class="widget-header">
-                        <h4 class="widget-title">Riwayat Servis</h4>
+                        <h4 class="widget-title">
+                            <i class="fa fa-history"></i> Riwayat Servis
+                        </h4>
                         <span class="widget-toolbar">
-                            <a href="#" id="link-lihat-semua-servis">Lihat Semua</a>
+                            <a href="#" id="link-lihat-semua-servis">
+                                <i class="fa fa-list"></i> Lihat Semua
+                            </a>
                         </span>
                     </div>
                     <div class="widget-body">
@@ -103,14 +144,38 @@
                                         <th>Aksi</th>
                                     </tr>
                                 </thead>
-                                <tbody id="tabel-servis"></tbody>
+                                <tbody id="tabel-servis">
+                                    <tr>
+                                        <td>15 Jan 2023</td>
+                                        <td>Auto Care Center</td>
+                                        <td>Servis Berkala 40.000 km</td>
+                                        <td>
+                                            <button class="btn btn-action btn-detail">Detail</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>10 Nov 2022</td>
+                                        <td>Speed Tune</td>
+                                        <td>Ganti kampas rem</td>
+                                        <td>
+                                            <button class="btn btn-action btn-detail">Detail</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>25 Jul 2022</td>
+                                        <td>Bengkel Sejahtera</td>
+                                        <td>Servis Berkala 30.000 km</td>
+                                        <td>
+                                            <button class="btn btn-action btn-detail">Detail</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
                             </table>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-
     </div> <!-- /.container-fluid -->
 </div> <!-- /.page-content -->
 <?php $this->endSection(); ?>
@@ -203,6 +268,16 @@
                 }
 
                 const imgElement = document.getElementById('foto-kendaraan');
+                const loadingContainer = document.getElementById('loading-contrainer');
+                imgElement.onload = function() {
+                    loadingContainer.style.display = 'none';
+                    imgElement.style.display = 'block';
+                };
+
+                imgElement.onerror = function() {
+                    loadingContainer.style.display = 'none';
+                    imgElement.src = 'https://via.placeholder.com/300x200?text=No+Image';
+                };
                 imgElement.src = `uploads/cars/${carsData['foto_kendaraan']}`;
                 imgElement.alt = `${carsData['merk']} ${carsData['type']}`;
 

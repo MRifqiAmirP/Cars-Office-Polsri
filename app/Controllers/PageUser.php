@@ -11,7 +11,8 @@ class PageUser extends BaseController
     {
         $data = [
             'title' => 'Dashboard',
-            'role' => $this->getUserRole()
+            'role' => $this->getUserRole(),
+            'css' => 'user_dashboard.css'
         ];
         
         return view('pages/user/dashboard', $data);
@@ -20,7 +21,8 @@ class PageUser extends BaseController
     public function service() {
         $data = [
             'title' => 'Service',
-            'role' => $this->getUserRole()
+            'role' => $this->getUserRole(),
+            'css' => 'user_service.css'
         ];
         
         return view('pages/user/service/service', $data);

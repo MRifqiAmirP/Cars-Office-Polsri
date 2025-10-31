@@ -16,7 +16,6 @@
 
   <!-- Page specific plugin styles -->
   <link rel="stylesheet" href="<?= base_url('assets/css/jquery-ui.custom.min.css') ?>" />
-  <link rel="stylesheet" href="<?= base_url('assets/css/fullcalendar.min.css') ?>" />
 
   <!-- Text fonts -->
   <link rel="stylesheet" href="<?= base_url('assets/css/fonts.googleapis.com.css') ?>" />
@@ -48,7 +47,8 @@
 
   <!-- Custom CSS -->
   <?php if (isset($css) && $css !== ''): ?>
-    <link rel="stylesheet" href="assets/css/custom/<?= $css; ?>" />
+    <!-- <link rel="stylesheet" href="assets/css/custom/<?= $css; ?>" /> -->
+    <link rel="stylesheet" href="<?= base_url('assets/css/custom/' . esc($css)); ?>">
   <?php endif; ?>
 
   <!-- HTML5shiv and Respond.js for IE8 support -->
