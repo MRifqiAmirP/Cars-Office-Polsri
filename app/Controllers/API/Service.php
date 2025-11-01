@@ -265,6 +265,28 @@ class Service extends BaseController
                 }
             }
 
+            $file = $this->request->getFile('file');
+            if ($file && $file->isValid() && !$file->hasMoved()) {
+                $allowedTypes = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'pdf'];
+                $fileExtension = $file->getClientExtension();
+
+                if (!in_array(strtolower($fileExtension), $allowedTypes)) {
+                    return responseError('Format file tidak didukung. Gunakan format: jpg, jpeg, png, gif, atau webp.', 400);
+                }
+
+                if ($file->getSize() > 2097152) {
+                    return responseError('Ukuran file terlalu besar. Maksimal 2MB.', 400);
+                }
+
+                if ($service->file && file_exists(FCPATH . 'uploads/service/file/' . $service->file)) {
+                    unlink(FCPATH . 'uploads/service/file/' . $service->file);
+                }
+
+                $newName = $file->getRandomName();
+                $file->move(FCPATH . 'uploads/service/file', $newName);
+                $data['file'] = $newName;
+            }
+
             $fotoNota = $this->request->getFile('foto_nota');
             if ($fotoNota && $fotoNota->isValid() && !$fotoNota->hasMoved()) {
                 $allowedTypes = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
@@ -278,12 +300,12 @@ class Service extends BaseController
                     return responseError('Ukuran file terlalu besar. Maksimal 2MB.', 400);
                 }
 
-                if ($service->foto_nota && file_exists(WRITEPATH . 'uploads/nota/' . $service->foto_nota)) {
-                    unlink(WRITEPATH . 'uploads/nota/' . $service->foto_nota);
+                if ($service->foto_nota && file_exists(FCPATH . 'uploads/service/nota/' . $service->foto_nota)) {
+                    unlink(FCPATH . 'uploads/service/nota/' . $service->foto_nota);
                 }
 
                 $newName = $fotoNota->getRandomName();
-                $fotoNota->move(WRITEPATH . 'uploads/nota', $newName);
+                $fotoNota->move(FCPATH . 'uploads/service/nota', $newName);
                 $data['foto_nota'] = $newName;
             }
 

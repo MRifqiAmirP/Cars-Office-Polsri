@@ -40,6 +40,15 @@ class Page extends Controller
 
         return view('pages/admin/cars/cars', $data);
     }
+         public function bengkel() {
+        $data = [
+            'title' => 'Mitra Bengkel',
+            'role' => $this->getUserRole(),
+            'css' => 'admin_mitra_bengkel.css'
+        ];
+
+        return view('pages/admin/bengkel/mitra_bengkel', $data);
+    }
 
       public function request_service() {
         $data = [
@@ -49,6 +58,7 @@ class Page extends Controller
 
         return view('pages/admin/request_service', $data);
     }
+
 
     protected function getUserRole() {
         return session()->get('role') ?? 'guest';
