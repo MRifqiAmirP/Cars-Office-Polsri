@@ -136,6 +136,7 @@
 			</div>
 			<div class="modal-footer">
 				<button class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+				<button class="btn btn-primary" >pdf</button>
 			</div>
 		</div>
 	</div>
@@ -236,7 +237,6 @@ document.addEventListener('DOMContentLoaded', async function() {
 						<button class="btn btn-info btn-sm" onclick="showDetail(${data.id})">
 							<i class="fa fa-eye"></i> Detail
 						</button>
-						<button class="btn btn-primary btn-harga-nota" onClick="edit(${data.id})" ${disabled}>PDF</button>
 				</tr>
 			`;
 		}).join('');
