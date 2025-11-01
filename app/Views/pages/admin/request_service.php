@@ -7,25 +7,37 @@
 			<i class="ace-icon fa fa-home home-icon"></i>
 			<a href="#">Home</a>
 		</li>
-
-		<li>
-			<a href="#">Master Data</a>
-		</li>
-		<li class="active">Kendaraan Dinas</li>
+		<li class="active">Request Service</li>
 	</ul>
 </div>
-
 <div class="container-fluid">
-	<h3 class="page-header" style="font-weight: bold;">Master Kendaraan Dinas</h3>
+	<h3 class="page-header" style="font-weight: bold;">Request Service</h3>
+	<div class="table-responsive" style="margin-top:20px;">
+		<table class="table table-bordered table-hover">
+			<thead>
+				<tr class="info">
+					<th>No.</th>
+					<th>Nama Pemilik</th>
+					<th>Merk</th>
+					<th>Type</th>
+					<th>Plat Kendaraan</th>
+					<th>Status</th>
+					<th>Bengkel</th>
+					<th>aksi</th>
+				</tr>
+			</thead>
+			<tbody>
+				<!-- DATA DIMUAT DI JAVASCRIPT -->
+			</tbody>
+		</table>
+	</div>
+</div>
 
-	<button class="btn btn-primary" data-toggle="modal" data-target="#modalTambahKendaraan">
-		<i class="glyphicon glyphicon-plus"></i> Tambah Kendaraan
-	</button>
+<!-- form -->
 
-	<div class="modal fade" id="modalTambahKendaraan" tabindex="-1" role="dialog" aria-labelledby="modalTambahKendaraanLabel">
+<div class="modal fade" id="modalTambahKendaraan" tabindex="-1" role="dialog" aria-labelledby="modalTambahKendaraanLabel">
 		<div class="modal-dialog" role="document">
 			<div class="modal-content">
-
 				<form id="formCars">
 					<input type="hidden" name="csrf" value="<?= csrf_hash(); ?>">
 					<div class="modal-header">
@@ -37,58 +49,8 @@
 
 					<div class="modal-body">
 						<div class="form-group">
-							<label for="user_id">Pemilik</label>
-							<select name="user_id" id="user_id" class="form-control">
-								<option value="">Pilih pemilik kendaraan</option>
-								<!-- DATA DIMUAT DI JAVASCRIPT -->
-							</select>
-						</div>
-
-						<div class="form-group">
-							<label for="nopol">Nomor Polisi</label>
-							<input type="text" class="form-control" id="nopol" name="nopol" placeholder="Masukkan nomor polisi" required>
-							<small class="form-text text-muted">
-								Contoh: BG 805 DZ
-							</small>
-						</div>
-
-						<div class="form-group">
-							<label for="merk">Merk</label>
-							<input type="merk" class="form-control" id="merk" name="merk" placeholder="Masukkan merk kendaraan" required>
-						</div>
-
-						<div class="form-group">
-							<label for="type">Type</label>
-							<input type="text" class="form-control" id="type" name="type" placeholder="Masukkan type kendaraan" required>
-							<small class="form-text text-muted">
-								Contoh: Avanza, Innova, Rush, Pajero, Fortuner
-							</small>
-						</div>
-
-						<div class="form-group">
-							<label for="no_bpkb">Nomor BPKB</label>
-							<input type="text" class="form-control" id="no_bpkb" name="no_bpkb" placeholder="Masukkan nomor BPKB" required>
-						</div>
-
-						<div class="form-group">
-							<label for="no_mesin">Nomor Mesin</label>
-							<input type="text" class="form-control" id="no_mesin" name="no_mesin" placeholder="Masukkan nomor mesin" required>
-						</div>
-
-						<div class="form-group">
-							<label for="no_rangka">Nomor Rangka</label>
-							<input type="text" class="form-control" id="no_rangka" name="no_rangka" placeholder="Masukkan nomor rangka" required>
-						</div>
-
-						<div class="form-group">
-							<label for="tahun_pembuatan">Tahun Pembuatan</label>
-							<input type="number"
-								class="form-control" id="tahun_pembuatan" name="tahun_pembuatan" placeholder="Masukkan tahun pembuatan" step="1" pattern="\d{4}" title="Masukkan tahun 4 digit (contoh: 2024)" required>
-						</div>
-
-						<div class="form-group">
 							<label for="keterangan">Keterangan</label>
-							<input type="text" id="keterangan" class="form-control" name="keterangan" placeholder="Masukkan keterangan">
+							<input type="varchar" id="keterangan" class="form-control" name="total harga" placeholder="Masukkan keterangan">
 						</div>
 
 						<div class="form-group">
@@ -102,7 +64,7 @@
 									<span style="display: block; font-size: 1.1rem; color: #495057; margin-bottom: 0.5rem;">Drag & drop foto di sini</span>
 									<span style="display: block; color: #6c757d; margin-bottom: 0.5rem;">atau</span>
 									<button type="button" style="background: #007bff; color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer;">Pilih File</button>
-									<input type="file" class="drop-zone-input" id="fileUpload" name="foto_kendaraan" hidden style="opacity: 0;">
+									<input type="file" class="drop-zone-input" id="fileUpload" name="foto_nota" hidden style="opacity: 0;">
 								</div>
 							</div>
 
@@ -113,7 +75,7 @@
 					</div>
 
 					<div class="modal-footer">
-						<button id="saveButton" type="submit" class="btn btn-success">
+						<button id="saveButton" type="submit" class="btn btn-success">>
 							<i class="glyphicon glyphicon-floppy-disk"></i> Simpan
 						</button>
 						<button type="button" class="btn btn-default" data-dismiss="modal">
@@ -126,27 +88,63 @@
 		</div>
 	</div>
 
-	<div class="table-responsive" style="margin-top:20px;">
-		<table class="table table-bordered table-hover">
-			<thead>
-				<tr class="info">
-					<th>No.</th>
-					<th>Foto Kendaraan</th>
-					<th>No. Polisi</th>
-					<th>Merk</th>
-					<th>Type</th>
-					<th>Nama Pemilik</th>
-					<th>Jabatan</th>
-					<th>Aksi</th>
-				</tr>
-			</thead>
-			<tbody>
-				<!-- DATA DIMUAT DI JAVASCRIPT -->
-			</tbody>
-		</table>
+	<!-- MODAL DETAIL -->
+<div class="modal fade" id="modalDetail" tabindex="-1" aria-labelledby="modalDetailLabel" aria-hidden="true">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header bg-primary text-white">
+				<h5 class="modal-title" id="modalDetailLabel">Detail Service Request</h5>
+				<button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+					<span>&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<table class="table table-bordered">
+					<tr>
+						<th>User</th>
+						<td id="detail_user"></td>
+					</tr>
+					<tr>
+						<th>Kendaraan</th>
+						<td id="detail_kendaraan"></td>
+					</tr>
+					<tr>
+						<th>Bengkel</th>
+						<td id="detail_bengkel"></td>
+					</tr>
+					<tr>
+						<th>Keluhan</th>
+						<td id="detail_keluhan"></td>
+					</tr>
+					<tr>
+						<th>Status</th>
+						<td id="detail_status"></td>
+					</tr>
+					<tr>
+						<th>Total Harga</th>
+						<td id="detail_total"></td>
+					</tr>
+					<tr>
+						<th>File</th>
+						<td id="detail_file"></td>
+					</tr>
+					<tr>
+						<th>Foto Nota</th>
+						<td id="detail_foto_nota"></td>
+					</tr>
+				</table>
+			</div>
+			<div class="modal-footer">
+				<button class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+				<button class="btn btn-primary" >pdf</button>
+			</div>
+		</div>
 	</div>
 </div>
+
 <?= $this->endSection(); ?>
+
+
 
 <?= $this->section('scripts'); ?>
 <script type="text/javascript">
@@ -177,127 +175,164 @@
 		}
 	})
 </script>
-
+<!-- data table -->
 <script>
-	document.addEventListener('DOMContentLoaded', async function() {
-		const tableBody = document.querySelector('table tbody');
-		const url = '/api/cars';
+document.addEventListener('DOMContentLoaded', async function() {
+	const tableBody = document.querySelector('table tbody');
 
-		try {
-			const result = await fetch(url);
-			const response = await result.json();
+	try {
+		const resService = await fetch('/api/service_request');
+		const resultService = await resService.json();
+		const reqService = Array.isArray(resultService.data) ? resultService.data : [];
 
-			const cars = Array.isArray(response.data) ? response.data : response;
+		const resBengkel = await fetch('/api/bengkel');
+		const resultBengkel = await resBengkel.json();
+		const bengkelList = resultBengkel.data?.bengkel || [];
 
-			if (cars.length === 0) {
-				tableBody.innerHTML = `
+		// Jika data kosong
+		if (reqService.length === 0) {
+			tableBody.innerHTML = `
 				<tr>
-					<td colspan="7" class="text-center text-muted">
-						Data belum ada
+					<td colspan="8" class="text-center text-muted py-3">
+						<i>Tidak ada data service request</i>
 					</td>
+				</tr>`;
+			return;
+		}
+
+		tableBody.innerHTML = reqService.map((data, index) => {
+			const options = bengkelList.map(b => `
+				<option value="${b.id}" ${data.bengkel_id == b.id ? 'selected' : ''}>
+					${b.nama_bengkel}
+				</option>
+			`).join('');
+
+			// Tombol input harga & nota 
+			const disabled = data.status !== 'selesai' ? 'disabled' : '';
+
+			return `
+				<tr>
+					<td>${index + 1}</td>
+					<td>${data.user_nama || '-'}</td>
+					<td>${data.merk || '-'}</td>
+					<td>${data.type || '-'}</td>
+					<td>${data.plat_kendaran || '-'}</td>
+					<td>
+						<select class="form-select status" data-id="${data.id}">
+							<option class="label label-warning" value="pending" ${data.status == 'pending' ? 'selected' : ''}>Pending</option>
+							<option class="label label-primary" value="waiting" ${data.status == 'waiting' ? 'selected' : ''}>Waiting</option>
+							<option class="label label-info" value="proses" ${data.status == 'proses' ? 'selected' : ''}>Proses</option>
+							<option class="label label-succes" value="selesai" ${data.status == 'selesai' ? 'selected' : ''}>Selesai</option>
+						</select>
+					</td>
+					<td>
+						<select class="form-select pilih-bengkel" data-id="${data.id}">
+							<option value="">-- Pilih Bengkel --</option>
+							${options}
+						</select>
+					</td>
+					<td class="text-center">
+						<button class="btn btn-success btn-input" data-id="${data.id}">Update</button>
+						<button class="btn btn-primary btn-harga-nota" onClick="edit(${data.id})" ${disabled}>Input Harga & Nota</button>
+						<button class="btn btn-info btn-sm" onclick="showDetail(${data.id})">
+							<i class="fa fa-eye"></i> Detail
+						</button>
 				</tr>
 			`;
-				return;
-			}
+		}).join('');
+// status kondisi
+document.querySelectorAll('.status').forEach(select => {
+  const updateClass = (el) => {
 
-			tableBody.innerHTML = cars.map((car, index) => `
-			<tr>
-				<td style="vertical-align: middle; text-align: center">${index + 1}</td>
-				<td style="text-align: center; width: 10%">
-					${car.foto_kendaraan ? 
-						`<img src="${car.foto_url}" alt="Cars POLSRI" loading="lazy" style="width: 150px; height: auto; display: block; margin: 0 auto;">` : 
-						'<strong>-</strong>'
+    el.classList.remove('label-warning', 'label-primary', 'label-info', 'label-success', 'text-white');
+
+    switch (el.value) {
+      case 'pending':
+        el.classList.add('label-warning', 'text-white');
+        break;
+      case 'waiting':
+        el.classList.add('label-primary', 'text-white');
+        break;
+      case 'proses':
+        el.classList.add('label-info', 'text-white');
+        break;
+      case 'selesai':
+        el.classList.add('label-success', 'text-white');
+        break;
+    }
+  };
+  updateClass(select);
+
+  select.addEventListener('change', function() {
+    updateClass(this);
+  });
+});
+
+		document.querySelectorAll('.btn-input').forEach(btn => {
+			btn.addEventListener('click', async function() {
+				const id = this.dataset.id;
+				const selectStatus = document.querySelector(`.status[data-id="${id}"]`);
+				const selectBengkel = document.querySelector(`.pilih-bengkel[data-id="${id}"]`);
+				const status = selectStatus.value;
+				const bengkelId = selectBengkel.value;
+
+				const formData = new FormData();
+				formData.append('bengkel_id', bengkelId);
+				formData.append('status', status);
+
+				try {
+					const csrfToken = '<?= csrf_hash() ?>';
+					const response = await fetch(`/api/service_request/update/${id}`, {
+						method: 'POST',
+						headers: { 'X-CSRF-TOKEN': csrfToken },
+						body: formData
+					});
+
+					const result = await response.json();
+					console.log('Response dari server:', result);
+
+					if (result.status === 'success') {
+						Swal.fire({
+							icon: 'success',
+							title: 'Berhasil!',
+							text: 'Bengkel dan status berhasil diupdate.',
+							confirmButtonColor: '#28a745',
+						}).then(() => location.reload());
+					} else {
+						Swal.fire({
+							icon: 'error',
+							title: 'Gagal update bengkel',
+							text: result.message || 'Unknown error',
+							confirmButtonColor: '#d33'
+						});
 					}
-				</td>
-				<td style="vertical-align: middle;">${car.nopol || '-'}</td>
-				<td style="vertical-align: middle;">${car.merk || '-'}</td>
-				<td style="vertical-align: middle;">${car.type || '-'}</td>
-				<td style="vertical-align: middle;">${car.user_nama || '-'}</td>
-				<td style="vertical-align: middle;">${car.jabatan || '-'}</td>
-				<td style="vertical-align: middle;">
-					<div class="btn-group">
-						<button type="button" onClick="edit(${car.id})" class="btn btn-xs btn-primary" style="margin-right: 8px;">Edit</button>
-						<button class="btn btn-xs btn-danger" style="margin-left: 8px;">Hapus</button>
-					</div>
-				</td>
-			</tr>
-		`).join('');
+				} catch (error) {
+					console.error('Error: ', error);
+					Swal.fire({
+						toast: true,
+						icon: 'error',
+						title: 'Gagal Menambahkan update bengkel',
+						text: error.message,
+						position: 'bottom-end',
+						showConfirmButton: false,
+						timer: 5000,
+						timerProgressBar: true
+					});
+				}
+			});
+		});
 
-		} catch (error) {
-			console.error('Gagal memuat data:', error);
-			tableBody.innerHTML = `
-			<tr>
-				<td colspan="7" class="text-center text-danger">
-					Gagal memuat data
-				</td>
-			</tr>
-		`;
-		}
-	})
-</script>
 
-<script>
-	document.getElementById('formCars').addEventListener('submit', async function(e) {
-		e.preventDefault()
-
-		const formData = new FormData(this)
-
-		const data = {
-			csrf_cookie: formData.get('csrf'),
-		}
-		formData.delete('csrf')
-
-		try {
-			const response = await fetch('/api/cars/create', {
-				method: 'POST',
-				headers: {
-					'X-CSRF-TOKEN': data.csrf_cookie
-				},
-				body: formData
-			})
-
-			const result = await response.json()
-
-			if (result.status === 'success') {
-				Swal.fire({
-					icon: 'success',
-					title: 'Berhasil!',
-					text: 'Kendaraan berhasil ditambahkan',
-					confirmButtonColor: '#28a745',
-					showCancelButton: false,
-					confirmButtonText: 'OK'
-				}).then((result) => {
-					if (result.isConfirmed) {
-						location.reload()
-					}
-				})
-			} else {
-				Swal.fire({
-					icon: 'error',
-					title: 'Gagal Menambahkan Kendaraan',
-					text: result.message || 'Unknown error',
-					confirmButtonColor: '#d33'
-				})
-			}
-		} catch (error) {
-			console.error('Error: ', error)
-			Swal.fire({
-				toast: true,
-				icon: 'error',
-				title: 'Gagal Menambahkan Kendaraan',
-				text: error.message,
-				position: 'bottom-end',
-				showConfirmButton: false,
-				timer: 5000,
-				timerProgressBar: true
-			})
-		}
-	})
+	} catch (error) {
+		console.error('Gagal memuat data:', error);
+		tableBody.innerHTML = `<tr><td colspan="8" class="text-center text-danger">Gagal memuat data</td></tr>`;
+	}
+});
 </script>
 
 <script>
 	async function edit(id) {
-		const url = `/api/cars/${id}`;
+		const url = `/api/service_request/${id}`;
 		document.getElementById('modalTambahKendaraanLabel').innerHTML = 'Edit Kendaraan';
 
 		try {
@@ -309,17 +344,9 @@
 				document.getElementById('saveButton').setAttribute('onclick', `update(${id})`)
 				document.getElementById('saveButton').setAttribute('type', 'button')
 
-				document.getElementById('user_id').value = data.user_id || '';
-				document.getElementById('nopol').value = data.nopol || '';
-				document.getElementById('merk').value = data.merk || '';
-				document.getElementById('type').value = data.type || '';
-				document.getElementById('no_bpkb').value = data.no_bpkb || '';
-				document.getElementById('no_mesin').value = data.no_mesin || '';
-				document.getElementById('no_rangka').value = data.no_rangka || '';
-				document.getElementById('tahun_pembuatan').value = data.tahun_pembuatan || '';
-				document.getElementById('keterangan').value = data.keterangan || '';
-				if(data.foto_url) {
-					fileHandler.setExistingFile(data.foto_url, data.foto_kendaraan);
+				document.getElementById('keterangan').value = data.total_harga || '';
+				if(data.foto_nota) {
+					fileHandler.setExistingFile(data.foto_nota, data.fota_nota);
 				}
 
 				$('#modalTambahKendaraan').modal('show');
@@ -335,6 +362,102 @@
 	}
 </script>
 
+<script>
+	async function update(id) {
+		const url = `/api/service_request/update/${id}`
+		const formData = new FormData(document.getElementById('formCars'))
+
+		const data = {
+			csrf_cookie: formData.get('csrf')
+		}
+
+
+		try {
+			const response = await fetch(url, {
+				method: 'POST',
+				headers: {
+					'X-CSRF-TOKEN': data.csrf_cookie
+				},
+				body: formData
+			})
+
+			
+
+			const result = await response.json()
+
+			if (result.status === 'success') {
+				Swal.fire({
+					icon: 'success',
+					title: 'Berhasil!',
+					text: 'User berhasil diupdate',
+					confirmButtonColor: '#28a745',
+					showCancelButton: false,
+					confirmButtonText: 'OK'
+				}).then((result) => {
+					if (result.isConfirmed) {
+						location.reload()
+					}
+				})
+			} else {
+				Swal.fire({
+					icon: 'error',
+					title: 'Gagal update User',
+					text: result.message || 'Unknown error',
+					confirmButtonColor: '#d33'
+				})
+			}
+		} catch (error) {
+			console.error('Error: ', error)
+			Swal.fire({
+				toast: true,
+				icon: 'error',
+				title: 'Gagal update User',
+				text: error.message,
+				position: 'bottom-end',
+				showConfirmButton: false,
+				timer: 5000,
+				timerProgressBar: true
+			})
+		}
+	}
+</script>
+<script>
+	async function showDetail(id) {
+		try {
+			const response = await fetch(`/api/service_request/${id}`);
+			const result = await response.json();
+
+			if (result.status === 'success' && result.data.length > 0) {
+				const d = result.data[0];
+
+				document.getElementById('detail_user').textContent = `${d.user_nama} (${d.user_email})`;
+				document.getElementById('detail_kendaraan').textContent = `${d.merk} ${d.type} - ${d.plat_kendaran}`;
+				document.getElementById('detail_bengkel').textContent = d.nama_bengkel ?? '-';
+				document.getElementById('detail_keluhan').textContent = d.keluhan ?? '-';
+				document.getElementById('detail_status').textContent = d.status ?? '-';
+				document.getElementById('detail_total').textContent = d.total_harga ?? '-';
+
+				// tampilkan file (jika ada)
+				const fileCell = document.getElementById('detail_file');
+				fileCell.innerHTML = d.file
+					? `<a href="/uploads/service_requests/file/${d.file}" target="_blank">Lihat File</a>`
+					: '-';
+
+				const notaCell = document.getElementById('detail_foto_nota');
+				notaCell.innerHTML = d.foto_nota
+					? `<img src="/uploads/service_requests/nota/${d.foto_nota}" alt="Nota" class="img-fluid" style="max-height:200px;">`
+					: '-';
+
+				$('#modalDetail').modal('show');
+			} else {
+				Swal.fire('Gagal', 'Data tidak ditemukan', 'error');
+			}
+		} catch (err) {
+			console.error(err);
+			Swal.fire('Error', 'Gagal mengambil data detail', 'error');
+		}
+	}
+</script>
 
 <script>
 	class FileUploadHandler {
@@ -1016,4 +1139,5 @@
 
 	const fileHandler = new FileUploadHandler('dropZone', 'fileUpload', 'fileInfo');
 </script>
+
 <?= $this->endSection(); ?>

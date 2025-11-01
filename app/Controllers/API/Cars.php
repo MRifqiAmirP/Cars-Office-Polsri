@@ -170,11 +170,19 @@ class Cars extends BaseController
 
             $fotoKendaraan = $this->request->getFile('foto_kendaraan');
 
-            if ($fotoKendaraan && $fotoKendaraan->isValid() && !$fotoKendaraan->hasMoved()) {
-                $validMimeTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
-                if (!in_array($fotoKendaraan->getMimeType(), $validMimeTypes)) {
-                    return responseError('Format file tidak didukung. Gunakan format JPG, PNG, atau GIF', 400);
-                }
+          if ($fotoKendaraan && $fotoKendaraan->isValid() && !$fotoKendaraan->hasMoved()) {
+
+    // Pastikan file temp benar-benar ada
+    if (!file_exists($fotoKendaraan->getTempName())) {
+        return responseError('File sementara tidak ditemukan. Coba upload ulang.', 400);
+    }
+
+    $mimeType = $fotoKendaraan->getMimeType();
+    $validMimeTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+
+    if (!in_array($mimeType, $validMimeTypes)) {
+        return responseError('Format file tidak didukung. Gunakan format JPG, PNG, atau GIF', 400);
+    }
 
                 if ($fotoKendaraan->getSize() > 5242880) {
                     return responseError('Ukuran file terlalu besar. Maksimal 5MB', 400);
